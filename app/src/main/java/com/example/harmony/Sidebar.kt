@@ -1,10 +1,15 @@
 package com.example.harmony
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.children
+import androidx.fragment.app.Fragment
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
@@ -33,7 +38,46 @@ class Sidebar : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sidebar, container, false)
+        val view = inflater.inflate(R.layout.fragment_sidebar, container, false)
+        val sidebar = view.findViewById<ConstraintLayout>(R.id.sidebar)
+        for (button in sidebar.children) {
+            if (button is ConstraintLayout) {
+                val indicator = button.findViewById<ImageView>(R.id.selectedIndicator)
+                button.setOnClickListener {
+                    for (otherButton in sidebar.children) {
+                        if (otherButton is ConstraintLayout) {
+                            val otherIndicator = otherButton.findViewById<ImageView>(R.id.selectedIndicator)
+                            otherIndicator?.visibility = View.INVISIBLE
+                        }
+                    }
+                    indicator.visibility = View.VISIBLE
+                    indicator.bringToFront()
+                    if(button.id == R.id.homeBtn){
+                        val focused = resources.getDrawable(R.drawable.custom_button_sidebar_focus)
+                        val buttonImage = button.findViewById<ImageView>(R.id.imageButton)
+                        buttonImage.setImageDrawable(focused)
+                    }
+                }
+            }
+            else if (button.id == R.id.new_channel) {
+                val focused = resources.getDrawable(R.drawable.add_server_focus)
+                val static = resources.getDrawable(R.drawable.add_server)
+                button.setOnTouchListener{ _, event ->
+                    when(event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            (button as ImageView).setImageDrawable(focused)
+                            true
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            (button as ImageView).setImageDrawable(static)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            }
+        }
+        return view
     }
 
     companion object {
