@@ -6,6 +6,7 @@
     <color name="primary_blurple">#5865F2</color>
     <color name="primary_gray">#1c1d22</color>
     <color name="primary_gray_light">#383b44</color>
+    <color name="primary_gray_bright">#EBECF0</color>
     <color name="primary_sidebar">#1e1f22</color>
     <color name="primary_green">#35ed7e</color>
 </resources>

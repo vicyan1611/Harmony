@@ -1,5 +1,6 @@
 package com.example.harmony
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -13,5 +14,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        val intent = Intent(this, DirectMessage::class.java)
+        startActivity(intent)
     }
 }
