@@ -39,12 +39,13 @@ import com.example.harmony.R
 import com.example.harmony.composes.RoundedButton
 
 @Composable
-fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend: Boolean = false, bio: String = "", modifier: Modifier, onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit = {}, bodyContent: @Composable RowScope.() -> Unit = {}) {
+fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend: Boolean = false, bio: String = "", modifier: Modifier, avatarUrl: String = "", onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit = {}, bodyContent: @Composable RowScope.() -> Unit = {}) {
     UserProfileLayout(
         displayedName = displayedName,
         username = username,
         bio = bio,
         modifier = modifier,
+        avatarUrl = avatarUrl,
         onDismissRequest = onDismissRequest,
         headerContent = {
             headerContent()
