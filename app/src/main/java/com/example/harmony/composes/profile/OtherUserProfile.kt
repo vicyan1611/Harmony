@@ -3,6 +3,7 @@ package com.example.harmony.composes.profile
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,7 +39,7 @@ import com.example.harmony.R
 import com.example.harmony.composes.RoundedButton
 
 @Composable
-fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend: Boolean = false, bio: String = "", modifier: Modifier, onDismissRequest: () -> Unit) {
+fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend: Boolean = false, bio: String = "", modifier: Modifier, onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit = {}, bodyContent: @Composable RowScope.() -> Unit = {}) {
     UserProfileLayout(
         displayedName = displayedName,
         username = username,
@@ -46,6 +47,7 @@ fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         headerContent = {
+            headerContent()
             if (isFriend) {
                 val unfriendDialogState = remember { mutableStateOf(false) }
                 RoundedButton(
@@ -63,6 +65,7 @@ fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend
             }
         },
         bodyContent = {
+            bodyContent()
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,

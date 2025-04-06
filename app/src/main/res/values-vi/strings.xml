@@ -12,4 +12,5 @@
     <string name="view_profile_audio_call_button">Cuộc gọi thoại</string>
     <string name="view_profile_video_call_button">Cuộc gọi video</string>
     <string name="view_profile_add_friend_button">Thêm bạn</string>
+    <string name="view_profile_bio_title">Giới thiệu</string>
 </resources>

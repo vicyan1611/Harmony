@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.harmony.composes.profile.MyProfile
 import com.example.harmony.composes.profile.OtherUserProfile
 import com.example.harmony.composes.ui.theme.HarmonyTheme
 
@@ -29,24 +30,42 @@ class Profile : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var showBottomSheet by remember { mutableStateOf(false) }
+            var showBottomSheet_other by remember { mutableStateOf(false) }
+            var showBottomSheet_mine by remember { mutableStateOf(false) }
             HarmonyTheme(isLightMode = false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Row (modifier = Modifier.padding(top = 30.dp, start = 10.dp, end = 10.dp).fillMaxSize()) {
                         Button(onClick = {
-                            showBottomSheet = true
+                            showBottomSheet_other = true
                         }) {
-                            Text(text = "Test")
-                            // Icon(Icons.Filled.Add, contentDescription = "click to show modal btm sheet")
+                            Text(text = "Test other")
                         }
-                        if (showBottomSheet) {
+                        Button(onClick = {
+                            showBottomSheet_mine = true
+                        }) {
+                            Text(text = "Test mine")
+                        }
+                        if (showBottomSheet_other) {
                             OtherUserProfile (
                                 displayedName = "ketamean",
                                 username = "_ketamean",
                                 isFriend = true,
+                                bio = "Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean",
                                 modifier = Modifier.fillMaxSize(),
                                 onDismissRequest = {
-                                    showBottomSheet = false
+                                    showBottomSheet_other = false
+                                }
+                            )
+                        }
+
+                        if (showBottomSheet_mine) {
+                            MyProfile (
+                                displayedName = "ketamean",
+                                username = "_ketamean",
+                                bio = "Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean",
+                                modifier = Modifier.fillMaxSize(),
+                                onDismissRequest = {
+                                    showBottomSheet_mine = false
                                 }
                             )
                         }
@@ -62,22 +81,22 @@ class Profile : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    var showBottomSheet by remember { mutableStateOf(false) }
+    var showBottomSheet_other by remember { mutableStateOf(false) }
     Scaffold(modifier = Modifier.fillMaxSize().padding(top = 30.dp, start = 10.dp, end = 10.dp)) { innerPadding ->
         Button(onClick = {
-            showBottomSheet = true
+            showBottomSheet_other = true
         }) {
             Text(text = "Test")
             // Icon(Icons.Filled.Add, contentDescription = "click to show modal btm sheet")
         }
-        if (showBottomSheet) {
+        if (showBottomSheet_other) {
             OtherUserProfile (
                 displayedName = "ketamean",
                 username = "_ketamean",
                 isFriend = true,
                 modifier = Modifier.fillMaxSize(),
                 onDismissRequest = {
-                    showBottomSheet = false
+                    showBottomSheet_other = false
                 }
             )
         }

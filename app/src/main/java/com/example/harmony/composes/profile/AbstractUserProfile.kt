@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,11 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.harmony.R
 import com.example.harmony.composes.RoundedAvatar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,6 +41,8 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
             .fillMaxWidth(),
 //            .heightIn(max = LocalConfiguration.current.screenHeightDp.dp * 0.2f), // set max height when fully expand, but it does not work ??
         // sheetState = rememberModalBottomSheetState(true), // skip partially expand
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
     ) {
         Column (
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -96,6 +102,45 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
                 }
             }
 
+            // bio
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        vertical = 6.dp,
+                        horizontal = 4.dp
+                    )
+            ) {
+                Column (
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.view_profile_bio_title),
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = Color.Gray
+                        )
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Text(
+                            text = bio,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
+                            style = TextStyle(
+                                color = MaterialTheme.colorScheme.onSecondary,
+                                fontSize = 16.sp,
+                                lineHeight = 24.sp
+                            )
+                        )
+                    }
+                }
+
+            }
             // body
             Row (
                 modifier = Modifier.fillMaxWidth()
