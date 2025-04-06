@@ -43,9 +43,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,16 +58,6 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.until
-
-val ggsans = FontFamily(
-    Font(R.font.ggsans),
-    Font(R.font.ggsans_bold, FontWeight.Bold),
-    Font(R.font.ggsans_medium, FontWeight.Medium),
-    Font(R.font.ggsans_normal, FontWeight.Normal),
-    Font(R.font.ggsans_semibold, FontWeight.SemiBold),
-    Font(R.font.ggsans_extrabold, FontWeight.ExtraBold),
-    Font(R.font.ggsans_normalitalic, FontWeight.Normal, FontStyle.Italic),
-)
 
 data class DateTime(
     val date: String,
@@ -127,10 +114,10 @@ class DirectMessage : ComponentActivity() {
     }
 }
 
-//@Preview(
-//    name = "Chat Header",
-//    showBackground = true,
-//)
+@Preview(
+    name = "Chat Header",
+    showBackground = true,
+)
 @Composable
 fun Header() {
     val primaryGray = colorResource(id = R.color.primary_gray)

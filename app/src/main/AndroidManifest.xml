@@ -18,6 +18,9 @@
             android:label="@string/title_activity_profile"
             android:theme="@style/Theme.Harmony" />
         <activity
+            android:name=".Search"
+            android:exported="false" />
+        <activity
             android:name=".DirectMessage"
             android:exported="false" />
         <activity
