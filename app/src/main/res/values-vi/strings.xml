@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Harmony</string>
+    <string name="delete_friend_prompt_description">Bạn có chắc muốn xóa người này khỏi nhóm bạn bè không?</string>
+    <string name="add_a_new_channel">Tạo channel mới</string>
+    <string name="avatar">Ảnh đại diện</string>
+    <string name="title_activity_profile">Hồ sơ</string>
+    <string name="delete_friend_prompt_header">Xóa</string>
+    <string name="delete_friend_prompt_btnDel">"Xóa "</string>
+    <string name="delete_friend_prompt_btnDismiss">Bỏ qua</string>
+    <string name="view_profile_send_message_button">Tin nhắn</string>
+    <string name="view_profile_audio_call_button">Cuộc gọi thoại</string>
+    <string name="view_profile_video_call_button">Cuộc gọi video</string>
+    <string name="view_profile_add_friend_button">Thêm bạn</string>
+</resources>
