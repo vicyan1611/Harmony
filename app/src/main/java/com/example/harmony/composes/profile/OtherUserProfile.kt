@@ -1,33 +1,21 @@
-package com.example.harmony.composes
+package com.example.harmony.composes.profile
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,140 +25,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.harmony.R
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun UserProfileLayout(displayedName: String = "", username: String = "", bio: String = "", modifier: Modifier, onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit, bodyContent: @Composable RowScope.() -> Unit) {
-    ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
-        modifier = modifier
-            .fillMaxWidth(),
-//            .heightIn(max = LocalConfiguration.current.screenHeightDp.dp * 0.2f), // set max height when fully expand, but it does not work ??
-        // sheetState = rememberModalBottomSheetState(true), // skip partially expand
-    ) {
-        Column (
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 8.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            // interactive buttons on top
-            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()){
-                headerContent()
-            }
-
-            // user info: avatar, name, username, bio
-            Row (
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column (
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    RoundedAvatar(size = 64.dp, char = displayedName.getOrElse(0) { ' ' }.uppercaseChar())
-                    Text(
-                        text = displayedName,
-                        style = TextStyle(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
-                        )
-                    )
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = username,
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                fontFamily = FontFamily.Monospace
-                            )
-                        )
-
-                        Box(modifier = Modifier
-                            .size(16.dp)
-                            .clip(CircleShape)
-                            .background(Color.Green), contentAlignment = Alignment.Center) {
-                            Text(
-                                text = "#",
-                                style = TextStyle(
-                                    color = Color.Black,
-                                    fontFamily = FontFamily.Serif,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-
-            // body
-            Row (
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                bodyContent()
-            }
-        }
-
-    }
-}
-
-@Composable
-fun RoundedContainer(modifier: Modifier = Modifier, size: Dp = 80.dp, content: @Composable BoxScope.() -> Unit) {
-    Box(
-        modifier = modifier
-            .size(size)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.secondary),
-        contentAlignment = Alignment.Center,
-        content = content
-    )
-}
-
-@Composable
-fun RoundedButton(modifier: Modifier = Modifier, size: Dp = 40.dp, onClick: () -> Unit, containerColor: Color = MaterialTheme.colorScheme.secondary, contentColor: Color = MaterialTheme.colorScheme.onSecondary, content: @Composable RowScope.() -> Unit) {
-    Button(
-        onClick = onClick,
-        colors = ButtonColors(
-            containerColor = containerColor,
-            contentColor = contentColor,
-            disabledContentColor = Color.LightGray,
-            disabledContainerColor = Color.LightGray
-        ),
-        shape = CircleShape,
-        modifier = Modifier.size(size),
-        contentPadding = PaddingValues(2.dp),
-        content = content
-    )
-}
-
-@Composable
-fun RoundedAvatar(modifier: Modifier = Modifier, size: Dp = 80.dp, char: Char = ' ') {
-    RoundedContainer(modifier = modifier, size = size) {
-        Text(
-            text = char.toString(),
-            style = TextStyle(
-                color = MaterialTheme.colorScheme.onSecondary,
-                fontSize = 24.sp
-            )
-        )
-    }
-}
+import com.example.harmony.composes.RoundedButton
 
 @Composable
 fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend: Boolean = false, bio: String = "", modifier: Modifier, onDismissRequest: () -> Unit) {
