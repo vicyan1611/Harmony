@@ -1,5 +1,6 @@
 package com.example.harmony.composes
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +40,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -49,6 +53,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import coil3.Bitmap
+import coil3.compose.AsyncImage
 import com.example.harmony.R
 
 
@@ -83,14 +89,23 @@ fun RoundedButton(modifier: Modifier = Modifier, size: Dp = 40.dp, onClick: () -
 }
 
 @Composable
-fun RoundedAvatar(modifier: Modifier = Modifier, size: Dp = 80.dp, char: Char = ' ') {
+fun RoundedAvatar(modifier: Modifier = Modifier, size: Dp = 80.dp, avatarImageUrl: String = "", char: Char = ' ') {
     RoundedContainer(modifier = modifier, size = size) {
-        Text(
-            text = char.toString(),
-            style = TextStyle(
-                color = MaterialTheme.colorScheme.onSecondary,
-                fontSize = 24.sp
+        if (avatarImageUrl.trim() == "") {
+            Text(
+                text = char.toString(),
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    fontSize = 24.sp
+                )
             )
-        )
+        } else {
+            AsyncImage(
+                model = avatarImageUrl,
+                contentDescription = "",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.FillBounds
+            )
+        }
     }
 }

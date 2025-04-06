@@ -34,7 +34,7 @@ import com.example.harmony.composes.RoundedAvatar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfileLayout(displayedName: String = "", username: String = "", bio: String = "", modifier: Modifier, onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit, bodyContent: @Composable RowScope.() -> Unit) {
+fun UserProfileLayout(displayedName: String = "", username: String = "", bio: String = "", modifier: Modifier, avatarUrl: String = "", onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit, bodyContent: @Composable RowScope.() -> Unit) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier
@@ -67,7 +67,7 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    RoundedAvatar(size = 64.dp, char = displayedName.getOrElse(0) { ' ' }.uppercaseChar())
+                    RoundedAvatar(size = 64.dp, char = displayedName.getOrElse(0) { ' ' }.uppercaseChar(), avatarImageUrl = avatarUrl)
                     Text(
                         text = displayedName,
                         style = TextStyle(
