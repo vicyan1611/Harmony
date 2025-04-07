@@ -8,10 +8,10 @@
       <SelectionState runConfigName="NotificationScreenPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="NotificationScreenPreview (1)">
+      <SelectionState runConfigName="VoiceChannelBottomSheetPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="VoiceChannelBottomSheetPreview">
+      <SelectionState runConfigName="SettingsScreenPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
