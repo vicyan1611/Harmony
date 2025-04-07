@@ -1,5 +1,7 @@
 package com.example.harmony.composes
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -23,10 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import coil3.compose.AsyncImage
 
 @Composable
@@ -125,4 +129,15 @@ fun TextBox(modifier: Modifier = Modifier, minLines: Int = 1, maxLines: Int = 1,
         }
 
     }
+}
+
+fun ShareText(textToShare: String, context: Context) {
+    val sendIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, textToShare)
+        type = "text/plain"
+    }
+
+    val shareIntent = Intent.createChooser(sendIntent, null) // Title for the chooser
+    context.startActivity(shareIntent, null)
 }

@@ -36,6 +36,7 @@ class Profile : ComponentActivity() {
             var showBottomSheet_other by remember { mutableStateOf(false) }
             var showBottomSheet_mine by remember { mutableStateOf(false) }
             var channelSettingSheet by remember { mutableStateOf(false) }
+            var showServerCreation by remember { mutableStateOf(false) }
             HarmonyTheme(isLightMode = false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Row (modifier = Modifier.padding(top = 30.dp, start = 10.dp, end = 10.dp).fillMaxSize()) {
@@ -55,6 +56,13 @@ class Profile : ComponentActivity() {
                         }) {
                             Text(text = "Test channel settings")
                         }
+
+                        Button(onClick = {
+                            showServerCreation = true
+                        }) {
+                            Text(text = "Test server creation")
+                        }
+
                         if (showBottomSheet_other) {
                             OtherUserProfile (
                                 displayedName = "ketamean",
@@ -90,6 +98,10 @@ class Profile : ComponentActivity() {
                                     channelSettingSheet = false
                                 }
                             )
+                        }
+
+                        if (showServerCreation) {
+
                         }
                     }
                 }

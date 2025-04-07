@@ -1,13 +1,19 @@
 package com.example.harmony
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import kotlin.jvm.Throws
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
@@ -31,6 +37,7 @@ class Sidebar : Fragment() {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility", "UseCompatLoadingForDrawables")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,18 +58,29 @@ class Sidebar : Fragment() {
         }
         val focused = resources.getDrawable(R.drawable.add_server_focus)
         val static = resources.getDrawable(R.drawable.add_server)
-        newChannelBtn.setOnTouchListener { _, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    (newChannelBtn as ImageView).setImageDrawable(focused)
-                    true
-                }
-                MotionEvent.ACTION_UP -> {
-                    (newChannelBtn as ImageView).setImageDrawable(static)
-                    true
-                }
-                else -> false
+//        newChannelBtn.setOnTouchListener { _, event ->
+//            when (event.action) {
+//                MotionEvent.ACTION_DOWN -> {
+//                    (newChannelBtn as ImageView).setImageDrawable(focused)
+//                    true
+//                }
+//                MotionEvent.ACTION_UP -> {
+//                    (newChannelBtn as ImageView).setImageDrawable(static)
+//                    true
+//                }
+//                else -> false
+//            }
+//        }
+
+        newChannelBtn.setOnClickListener {
+            try {
+                val context = requireContext()
+                val intent = Intent(context, ServerCreation::class.java)
+                startActivity(intent)
+            } catch (t: Throwable) {
+                Log.d("Sidebar", t.toString())
             }
+
         }
         return view
     }
