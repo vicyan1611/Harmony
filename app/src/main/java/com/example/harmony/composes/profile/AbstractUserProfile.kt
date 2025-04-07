@@ -27,9 +27,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.harmony.R
+import com.example.harmony.composes.MultiLineTextField
 import com.example.harmony.composes.RoundedAvatar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,6 +105,16 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
             }
 
             // bio
+//            MultiLineTextField(
+//                modifier = Modifier.fillMaxWidth(),
+//                editable = false,
+//                text = bio,
+//                onValueChange = {},
+//                textStyle = TextStyle(
+//                    fontSize = 16.sp,
+//                    lineHeight = 24.sp
+//                )
+//            )
             Row (
                 modifier = Modifier
                     .fillMaxWidth()
@@ -122,22 +134,18 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
                             color = Color.Gray
                         )
                     )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.secondary)
-                    ) {
-                        Text(
-                            text = bio,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
-                            style = TextStyle(
-                                color = MaterialTheme.colorScheme.onSecondary,
-                                fontSize = 16.sp,
-                                lineHeight = 24.sp
-                            )
-                        )
-                    }
+
+                    MultiLineTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        editable = false,
+                        text = bio,
+                        onValueChange = {},
+                        textStyle = TextStyle(
+                            color = MaterialTheme.colorScheme.onSecondary,
+                            fontSize = 16.sp,
+                            lineHeight = 24.sp
+                        ),
+                    )
                 }
 
             }
