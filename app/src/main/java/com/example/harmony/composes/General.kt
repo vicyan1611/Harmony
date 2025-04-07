@@ -1,6 +1,5 @@
 package com.example.harmony.composes
 
-import android.text.Editable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -11,39 +10,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 
@@ -99,14 +81,14 @@ fun RoundedAvatar(modifier: Modifier = Modifier, size: Dp = 80.dp, avatarImageUr
 }
 
 @Composable
-fun TextBox(modifier: Modifier = Modifier, minLines: Int = 1, maxLines: Int = 1, editable: Boolean = false, text: String = "", style: TextStyle = LocalTextStyle.current, onValueChange: (String) -> Unit = {}, label: String = "", showCharsCounter: Boolean = false, maxChars: Int = Int.MAX_VALUE) {
+fun TextBox(modifier: Modifier = Modifier, minLines: Int = 1, maxLines: Int = 1, editable: Boolean = false, text: String = "", textStyle: TextStyle = LocalTextStyle.current, onValueChange: (String) -> Unit = {}, label: String = "", showCharsCounter: Boolean = false, maxChars: Int = Int.MAX_VALUE) {
     Box(modifier = modifier) {
         OutlinedTextField(
             value = text,
             onValueChange = onValueChange,
             modifier = modifier,
             readOnly = !editable,
-            textStyle = style,
+            textStyle = textStyle,
             singleLine = (maxLines == 1),
             minLines = minLines,
             maxLines = maxLines,
