@@ -8,17 +8,6 @@
     android:background="@color/primary_gray"
     tools:context=".MainActivity">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@id/SidebarCont"
-        android:name="com.example.harmony.Sidebar"
-        android:layout_width="80dp"
-        android:layout_height="0dp"
-        android:fitsSystemWindows="true"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavFragment"
-        app:layout_constraintEnd_toStartOf="@+id/messageCenter"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@id/messageCenter"
@@ -143,5 +132,17 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteX="80dp"
         tools:layout_editor_absoluteY="161dp" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@id/SidebarCont"
+        android:name="com.example.harmony.Sidebar"
+        android:layout_width="80dp"
+        android:layout_height="0dp"
+        android:fitsSystemWindows="true"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavFragment"
+        app:layout_constraintEnd_toStartOf="@+id/messageCenter"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

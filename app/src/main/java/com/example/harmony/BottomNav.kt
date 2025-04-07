@@ -1,10 +1,23 @@
 package com.example.harmony
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import androidx.activity.compose.setContent
 import android.view.ViewGroup
+import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
+import com.example.harmony.composes.profile.MyProfile
+import com.example.harmony.composes.ui.theme.HarmonyTheme
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -29,12 +42,49 @@ class BottomNav : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_bottom_nav, container, false)
+        val view = inflater.inflate(R.layout.fragment_bottom_nav, container, false)
+        view.findViewById<BottomNavigationView>(R.id.bottomNavView).setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.home -> {
+                    // Handle home button click
+                    true
+                }
+                R.id.notifications -> {
+                    // Handle notifications button click
+                    true
+                }
+                R.id.profile -> {
+                    val context = requireContext()
+                    val activity = context as? ComponentActivity
+                    activity?.setContent {
+                        HarmonyTheme (isLightMode = false) {
+                            var state by remember { mutableStateOf(false) }
+                            MyProfile(
+                                displayedName = "ketamean",
+                                username = "_ketamean123",
+                                bio = "Toi sẽ giới thiệu về bản thân mình thật là ngắn gọn nhé",
+                                avatarUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s",
+                                modifier = Modifier,
+                                onDismissRequest = {
+                                    state = false
+                                    activity.setContentView(R.layout.activity_main)
+                                    WindowCompat.setDecorFitsSystemWindows(activity.window, false)
+                                }
+                            )
+                        }
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
+
+        return view
     }
 
     companion object {
