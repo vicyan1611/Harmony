@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -50,7 +51,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VoiceChannelBottomSheet(
     participants: List<VoiceParticipant>,
@@ -62,14 +62,10 @@ fun VoiceChannelBottomSheet(
     var isMuted by remember { mutableStateOf(true) }
     var currentParticipants by remember { mutableStateOf(participants) }
 
-
-    val sheetState = rememberModalBottomSheetState()
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = Color(0xFF1E1F22),
-        dragHandle = null
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF1E1F22))
     ) {
         Column(
             modifier = Modifier
@@ -123,7 +119,7 @@ fun VoiceChannelBottomSheet(
 
             // People count
             Text(
-                text = "${participants.size} People in Voice",
+                text = "${currentParticipants.size} People in Voice",
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White.copy(alpha = 0.7f),
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
@@ -136,7 +132,7 @@ fun VoiceChannelBottomSheet(
                     .background(Color(0xFF2B2D31))
             ) {
                 LazyColumn {
-                    items(participants) { participant ->
+                    items(currentParticipants) { participant ->
                         VoiceParticipantItem(participant)
                         if (participant != participants.last()) {
                             Divider(color = Color(0xFF3F4147), thickness = 0.5.dp)
@@ -146,8 +142,6 @@ fun VoiceChannelBottomSheet(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Bottom controls
 
             // Bottom controls
             Row(
@@ -186,6 +180,7 @@ fun VoiceChannelBottomSheet(
                         } else {
                             currentParticipants = currentParticipants.filter { it.name != "Me" }
                         }
+
                         hasJoined = !hasJoined
                     },
                     modifier = Modifier
