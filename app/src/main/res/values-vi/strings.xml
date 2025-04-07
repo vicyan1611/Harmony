@@ -13,4 +13,11 @@
     <string name="view_profile_video_call_button">Cuộc gọi video</string>
     <string name="view_profile_add_friend_button">Thêm bạn</string>
     <string name="view_profile_bio_title">Giới thiệu</string>
+    <string name="channel_config_btnSettings_label">Cài đặt</string>
+    <string name="channel_setting_btnSave">Lưu</string>
+    <string name="channel_setting_title_cnName">Tên kênh</string>
+    <string name="channel_setting_title_cnDescription">Mô tả kênh</string>
+    <string name="channel_setting_title_cnDelete">Xóa kênh</string>
+    <string name="channel_config_btnNotifications_label">Thông báo</string>
+    <string name="channel_config_memberList_title">Thành viên</string>
 </resources>
