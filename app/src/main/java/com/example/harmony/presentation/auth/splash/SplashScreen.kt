@@ -47,7 +47,7 @@ fun SplashScreen(
     ) {
 
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            painter = painterResource(R.drawable.harmony_logo),
             contentDescription = "App Logo",
             modifier = Modifier.size(120.dp)
         )
