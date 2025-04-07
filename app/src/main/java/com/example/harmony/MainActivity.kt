@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-//        val intent = Intent(this, ServerCreation::class.java)
-//        startActivity(intent)
+        val intent = Intent(this, DirectMessage::class.java)
+        startActivity(intent)
     }
 }

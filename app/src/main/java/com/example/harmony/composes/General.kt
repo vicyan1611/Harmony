@@ -18,6 +18,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -85,7 +86,20 @@ fun RoundedAvatar(modifier: Modifier = Modifier, size: Dp = 80.dp, avatarImageUr
 }
 
 @Composable
-fun TextBox(modifier: Modifier = Modifier, minLines: Int = 1, maxLines: Int = 1, editable: Boolean = false, text: String = "", textStyle: TextStyle = LocalTextStyle.current, onValueChange: (String) -> Unit = {}, label: String = "", showCharsCounter: Boolean = false, maxChars: Int = Int.MAX_VALUE) {
+fun TextBox(modifier: Modifier = Modifier, minLines: Int = 1, maxLines: Int = 1, editable: Boolean = false, text: String = "", textStyle: TextStyle = LocalTextStyle.current, onValueChange: (String) -> Unit = {}, label: String = "", showCharsCounter: Boolean = false, maxChars: Int = Int.MAX_VALUE,
+            colors: TextFieldColors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.tertiary,
+                unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
+                disabledContainerColor = MaterialTheme.colorScheme.tertiary,
+                focusedTextColor = MaterialTheme.colorScheme.onTertiary,
+                unfocusedTextColor = MaterialTheme.colorScheme.onTertiary,
+                disabledTextColor = MaterialTheme.colorScheme.onTertiary,
+                focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onTertiary,
+                disabledLabelColor = MaterialTheme.colorScheme.onTertiary,
+                cursorColor = MaterialTheme.colorScheme.onTertiary,
+                focusedIndicatorColor = MaterialTheme.colorScheme.onSecondary
+            )) {
     Box(modifier = modifier) {
         OutlinedTextField(
             value = text,
