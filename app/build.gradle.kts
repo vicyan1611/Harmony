@@ -71,7 +71,9 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.material)
+    implementation(libs.coil.kt.coil.compose)
     implementation(libs.kotlinx.datetime) // For DateTime
+    implementation(libs.jsoup)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

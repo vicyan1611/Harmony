@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val intent = Intent(this, Search::class.java)
+        val intent = Intent(this, DirectMessage::class.java)
         startActivity(intent)
     }
 }
