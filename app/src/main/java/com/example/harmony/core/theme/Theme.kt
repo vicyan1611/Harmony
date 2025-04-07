@@ -43,7 +43,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun ConnectTheme(
+fun HarmonyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {

@@ -5,6 +5,7 @@ constraintlayoutCompose = "1.1.1"
 firebaseBom = "33.12.0"
 hiltAndroid = "2.51.1"
 hiltAndroidCompiler = "2.51.1"
+hiltNavigationCompose = "1.2.0"
 kotlin = "2.0.21"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -24,6 +25,7 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose" }
 androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-material3 = { module = "androidx.compose.material3:material3" }
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }

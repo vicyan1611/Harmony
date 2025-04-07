@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.harmony.core.theme.ConnectTheme
+import com.example.harmony.core.theme.HarmonyTheme
 
 @Composable
 fun HarmonyButton(
@@ -48,7 +48,7 @@ fun HarmonyButton(
 @Preview
 @Composable
 fun HarmonyButtonPreview() {
-    ConnectTheme {
+    HarmonyTheme {
         HarmonyButton(
             text = "Login",
             onClick = {}

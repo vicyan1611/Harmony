@@ -66,7 +66,8 @@ dependencies {
     // DI - Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
-
+    implementation(libs.androidx.hilt.navigation.compose)
+    
 
 //    Firebase
     implementation(platform(libs.firebase.bom))

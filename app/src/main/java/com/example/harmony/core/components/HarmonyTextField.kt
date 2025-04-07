@@ -22,8 +22,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
+import com.example.harmony.core.theme.HarmonyTheme
 
 @Composable
 fun HarmonyTextField(
@@ -91,4 +92,15 @@ fun HarmonyTextField(
         maxLines = maxLines,
         shape = RoundedCornerShape(8.dp)
     )
+}
+
+@Preview
+@Composable
+fun HarmonyTextFieldPreview() {
+    HarmonyTheme {
+        HarmonyTextField(
+            value = "Email",
+            onValueChange = {}
+        )
+    }
 }
