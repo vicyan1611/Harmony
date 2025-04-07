@@ -76,7 +76,6 @@ fun DiscordNotification(
 
     var showDeleteOptions by remember { mutableStateOf(false) }
 
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -92,7 +91,7 @@ fun DiscordNotification(
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 //change url image here
-                .data("file:///android_asset/cat.jpg")
+                .data(avatarUrl)
                 .crossfade(true)
                 .build(),
             contentDescription = "Channel Avatar",
@@ -172,6 +171,7 @@ fun DiscordNotification(
                     text = "Remove Notification",
                     onClick = {
                         onDelete()
+                        Log.d("Debug From Delete", "Delete")
                         showDeleteOptions = false
                     }
                 )
@@ -244,14 +244,14 @@ fun NotificationScreen() {
     val notificationItems = remember {
         listOf(
             NotificationItem(
-                channelName = "ketamean mentioned you in ML + Mobile - announcement:",
-                message = "các anh làm nhớ chưa sẵn cái gọi string từ R.string... nha\ntao string trong string xml rồi xài hàm stringResource(R.string....) để truy xuất\n@ketamean @khoile8407 @Vinh Phạm",
+                channelName = "User1 mentioned you in ML + Mobile - announcement:",
+                message = "các bạn làm nhớ chưa sẵn cái gọi string từ R.string... nha\ntạo string trong string xml rồi xài hàm stringResource(R.string....) để truy xuất\n@ketamean @khoile8407 @Vinh Phạm",
                 timestamp = "14h",
-                avatarUrl = "https://example.com/avatar1.jpg",
+                avatarUrl = "file:///android_asset/cat.jpg",
                 isMention = true
             ),
             NotificationItem(
-                channelName = "EmRT mentioned you in SAB in HCMUS - Tha thiết tìm bạn nam ở ghép (liên càng tốt ạ):",
+                channelName = "User2 mentioned you in SAB in HCMUS - Tha thiết tìm bạn nam ở ghép (liên càng tốt ạ):",
                 message = "Địa chỉ: Trần Hưng Đạo, P7, Q5 (Gần đoạn Trần Hưng Đạo x Nguyễn Tri Phương x An Bình)\n\nPhòng ở lầu 3 giá 3.500k/phòng/tháng (chưa chia đầu người)\nĐiện, nước giá nhà nước.\nRác 100k/phòng/tháng\nXe 300k/xe\nPhòng gồm 1 phòng khách, 1 gác, 1 phòn...",
                 timestamp = "15h",
                 avatarUrl = "https://example.com/avatar2.jpg",
@@ -265,30 +265,31 @@ fun NotificationScreen() {
                 isMention = false
             ),
             NotificationItem(
-                channelName = "PAK ko tôỷ mentioned you in SAB in HCMUS - 🍌 | seeding:",
+                channelName = "User1 mentioned you in SAB in HCMUS - 🍌 | seeding:",
                 message = "@Sabies Khởi mới được biết là bên Pima đang có chương trình học này và nó hoàn",
                 timestamp = "2d",
-                avatarUrl = "https://example.com/avatar4.jpg",
+                avatarUrl = "file:///android_asset/cat.jpg",
                 isMention = true
             ),
             NotificationItem(
-                channelName = "PAK ko toi mentioned you in SAB in HCMUS - 🍌 | seeding:",
+                channelName = "User3 ko toi mentioned you in SAB in HCMUS - 🍌 | seeding:",
                 message = "@Sabies Khởi mới được biết là bên Pima đang có chương trình học này và nó hoàn",
                 timestamp = "2d",
-                avatarUrl = "https://example.com/avatar4.jpg",
+                avatarUrl = "file:///android_asset/cat.jpg",
                 isMention = true
             ),
             NotificationItem(
-                channelName = "PAK ko tôỷ mentioned you in SAB in HCMUS - 🍌 | seeding:",
+                channelName = "User3 mentioned you in SAB in HCMUS - 🍌 | seeding:",
                 message = "@Sabies Khởi mới được biết là bên Pima đang có chương trình học này và nó hoàn",
                 timestamp = "2d",
-                avatarUrl = "https://example.com/avatar4.jpg",
+                avatarUrl = "file:///android_asset/cat.jpg",
                 isMention = true
             )
         )
     }
 
     var selectedTab by remember { mutableStateOf(1) } // Default to Notifications tab
+    var notifications by remember {mutableStateOf (notificationItems)}
 
     Scaffold(
         bottomBar = { FooterNavigation(selectedTab, onTabSelected = {
@@ -308,7 +309,7 @@ fun NotificationScreen() {
                     LazyColumn {
                             item { SectionHeader("Recent Activity") }
 
-                            items(notificationItems) { item ->
+                            items(notifications) { item ->
                                 DiscordNotification(
                                     channelName = item.channelName,
                                     message = item.message,
@@ -316,7 +317,10 @@ fun NotificationScreen() {
                                     avatarUrl = item.avatarUrl,
                                     isMention = item.isMention,
                                     onClick = {},
-                                    onDelete = {}
+                                    onDelete = {
+                                        Log.d("Debug From Delete call back", "Delete")
+                                        notifications = notifications.filter { it != item }
+                                    }
                                 )
 
                                 Divider(

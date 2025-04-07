@@ -1,5 +1,6 @@
 package com.example.harmony.composes.voice
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Mic
@@ -26,13 +26,10 @@ import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +52,8 @@ import coil3.request.crossfade
 fun VoiceChannelBottomSheet(
     participants: List<VoiceParticipant>,
     onDismiss: () -> Unit,
-    onJoinVoice: () -> Unit
+    onJoinVoice: () -> Unit,
+    onInvite: () -> Unit
 ) {
 
     var hasJoined by remember { mutableStateOf(false) }
@@ -201,7 +199,9 @@ fun VoiceChannelBottomSheet(
 
                 // Invite Friend button
                 IconButton(
-                    onClick = {  /* handle invite friend */},
+                    onClick = {  /* handle invite friend */
+                        onInvite()
+                    },
                     modifier = Modifier
                         .size(56.dp)
                         .clip(CircleShape)
@@ -266,6 +266,9 @@ fun VoiceParticipantItem(participant: VoiceParticipant) {
 @Composable
 fun YourScreen() {
     var showVoiceChannel by remember { mutableStateOf(false) }
+    var showInviteFriends by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     Button(onClick = { showVoiceChannel = true }) {
         Text("Show Voice Channel")
@@ -276,7 +279,20 @@ fun YourScreen() {
             participants = voiceParticipants,
             onDismiss = { showVoiceChannel = false },
             onJoinVoice = {
+            },
+            onInvite = {
+                showInviteFriends = true
+            }
+        )
+    }
 
+    if (showInviteFriends) {
+        InviteFriendsBottomSheet(
+            onDismiss = { showInviteFriends = false },
+            onInvite = { friendName ->
+                // handle
+                Toast.makeText(context, "Invited $friendName", Toast.LENGTH_SHORT).show()
+                showInviteFriends = false
             }
         )
     }
