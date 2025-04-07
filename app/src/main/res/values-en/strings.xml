@@ -13,4 +13,11 @@
     <string name="view_profile_video_call_button">Video call</string>
     <string name="view_profile_add_friend_button">Add friend</string>
     <string name="view_profile_bio_title">Bio</string>
+    <string name="channel_config_btnSettings_label">Settings</string>
+    <string name="channel_setting_btnSave">Save</string>
+    <string name="channel_setting_title_cnName">Channel name</string>
+    <string name="channel_setting_title_cnDescription">Channel description</string>
+    <string name="channel_setting_title_cnDelete">Delete channel</string>
+    <string name="channel_config_btnNotifications_label">Noti</string>
+    <string name="channel_config_memberList_title">Participants</string>
 </resources>

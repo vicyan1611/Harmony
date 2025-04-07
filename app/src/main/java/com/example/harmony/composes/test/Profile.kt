@@ -20,11 +20,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.harmony.composes.channel.ChannelConfigMenus
 import com.example.harmony.composes.profile.MyProfile
 import com.example.harmony.composes.profile.OtherUserProfile
 import com.example.harmony.composes.ui.theme.HarmonyTheme
+import kotlin.uuid.ExperimentalUuidApi
 
 class Profile : ComponentActivity() {
+    @OptIn(ExperimentalUuidApi::class)
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +35,7 @@ class Profile : ComponentActivity() {
         setContent {
             var showBottomSheet_other by remember { mutableStateOf(false) }
             var showBottomSheet_mine by remember { mutableStateOf(false) }
+            var channelSettingSheet by remember { mutableStateOf(false) }
             HarmonyTheme(isLightMode = false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Row (modifier = Modifier.padding(top = 30.dp, start = 10.dp, end = 10.dp).fillMaxSize()) {
@@ -44,6 +48,12 @@ class Profile : ComponentActivity() {
                             showBottomSheet_mine = true
                         }) {
                             Text(text = "Test mine")
+                        }
+
+                        Button(onClick = {
+                            channelSettingSheet = true
+                        }) {
+                            Text(text = "Test channel settings")
                         }
                         if (showBottomSheet_other) {
                             OtherUserProfile (
@@ -67,6 +77,17 @@ class Profile : ComponentActivity() {
                                 avatarUrl = "https://cdn-imgix.headout.com/tour/7064/TOUR-IMAGE/b2c74200-8da7-439a-95b6-9cad1aa18742-4445-dubai-img-worlds-of-adventure-tickets-02.jpeg?auto=format&w=900&h=562.5&q=90&fit=crop&ar=16%3A10",
                                 onDismissRequest = {
                                     showBottomSheet_mine = false
+                                }
+                            )
+                        }
+
+                        if (channelSettingSheet) {
+                            ChannelConfigMenus (
+                                modifier = Modifier.fillMaxSize(),
+                                channelName = "#hehe",
+                                channelDescription = "Đây là channel mà tôi đã tạo. Đây là channel mà tôi đã tạo. Đây là channel mà tôi đã tạo. Đây là channel mà tôi đã tạo. Đây là channel mà tôi đã tạo. Đây là channel mà tôi đã tạo.",
+                                onDismissRequest = {
+                                    channelSettingSheet = false
                                 }
                             )
                         }
