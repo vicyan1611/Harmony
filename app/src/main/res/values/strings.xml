@@ -21,4 +21,12 @@
     <string name="channel_setting_title_cnDelete">Delete channel</string>
     <string name="channel_config_btnNotifications_label">Notifications</string>
     <string name="channel_config_memberList_title">Participants</string>
+    <string name="server_creation_servername_title">Create Your Server</string>
+    <string name="server_creation_servername_label">Server name</string>
+    <string name="server_creation_createbutton">Create Server</string>
+    <string name="server_creation_invite_title">Invite someone</string>
+    <string name="server_creation_invite_description">You will need some friends to maximally utilise your server</string>
+    <string name="server_creation_servername_description">Create your own server and start chatting.</string>
+    <string name="server_creation_invite_sharelinkButton">Share Link</string>
+    <string name="server_creation_invite_doneButton">Done</string>
 </resources>
