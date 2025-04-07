@@ -43,6 +43,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.media3.common.ktx)
     // Jetpack Compose
     val composeBom = platform("androidx.compose:compose-bom:2025.02.00")
     implementation(composeBom)
@@ -50,6 +52,10 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.constraintlayout.compose)
+
+    //Dangger
+    implementation("com.google.dagger:hilt-android:2.50")
+    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 
 
@@ -78,7 +84,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
-
-
 }
+

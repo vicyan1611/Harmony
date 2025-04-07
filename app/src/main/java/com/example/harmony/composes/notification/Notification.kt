@@ -1,6 +1,6 @@
 package com.example.harmony.composes.notification
 
-import androidx.compose.animation.core.MutableTransitionState
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,25 +21,29 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,11 +52,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,8 +63,6 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 data class NotificationItem(
     val channelName: String,
@@ -87,15 +87,17 @@ fun DiscordNotification(
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         // Avatar
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(avatarUrl)
+                //change url image here
+                .data("file:///android_asset/cat.jpg")
                 .crossfade(true)
                 .build(),
             contentDescription = "Channel Avatar",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
@@ -157,72 +159,10 @@ fun DiscordNotification(
     }
 }
 
-// header of notification
-@Composable
-fun HeaderNotification() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFF2E3136))
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Notifications",
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color.White,
-            modifier = Modifier.align(Alignment.CenterStart)
-        )
-        Icon(
-            imageVector = Icons.Default.MoreVert,
-            contentDescription = "More options",
-            tint = Color.White,
-            modifier = Modifier.align(Alignment.CenterEnd)
-        )
-    }
-}
 
-// footer navigation
-@Composable
-fun FooterNavigation(selectedTab: Int, onTabSelected: (Int) -> Unit) {
-    NavigationBar(
-        containerColor = Color(0xFF2E3136),
-        contentColor = Color.White
-    ) {
-        NavigationBarItem(
-            icon = {
-                BadgedBox(
-                    badge = {
-                        if (selectedTab != 0) {
-                            Badge { Text("261") }
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Home,
-                        contentDescription = "Home"
-                    )
-                }
-            },
-            label = { Text("Home") },
-            selected = selectedTab == 0,
-            onClick = { onTabSelected(0) }
-        )
 
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Notifications, contentDescription = "Notifications") },
-            label = { Text("Notifications") },
-            selected = selectedTab == 1,
-            onClick = { onTabSelected(1) }
-        )
 
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Person, contentDescription = "You") },
-            label = { Text("You") },
-            selected = selectedTab == 2,
-            onClick = { onTabSelected(2) }
-        )
-    }
-}
+
 
 // section header for notification groups
 @Composable
@@ -288,7 +228,10 @@ fun NotificationScreen() {
     var selectedTab by remember { mutableStateOf(1) } // Default to Notifications tab
 
     Scaffold(
-        bottomBar = { FooterNavigation(selectedTab, onTabSelected = { selectedTab = it }) }
+        bottomBar = { FooterNavigation(selectedTab, onTabSelected = {
+            selectedTab = it
+            Log.d("Debug From On tab", "tab $it")
+        }) }
     ) { paddingValues ->
             Surface(
                 modifier = Modifier
@@ -322,8 +265,6 @@ fun NotificationScreen() {
             }
         }
 }
-
-
 
 @Preview(showBackground = true)
 @Composable
