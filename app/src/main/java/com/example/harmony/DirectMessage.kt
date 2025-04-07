@@ -4,12 +4,18 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,15 +24,30 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ForwardToInbox
+import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.automirrored.rounded.Send
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EmojiEmotions
+import androidx.compose.material.icons.filled.ForwardToInbox
+import androidx.compose.material.icons.filled.HeartBroken
+import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material.icons.rounded.Adjust
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.FileUpload
 import androidx.compose.material.icons.rounded.PhotoLibrary
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -38,18 +59,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.harmony.composes.TextBox
+import com.example.harmony.composes.ui.theme.HarmonyTheme
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
@@ -83,7 +115,245 @@ data class Message(
     ),
 )
 
+sealed class MessageSettingScreens(val route: String, val label: String) {
+    object General: MessageSettingScreens("message-setting/", "General") // top level
+    object ChooseEmoji: MessageSettingScreens("message-setting/choose-emoji", "Emoji")
+}
+
+@Composable
+fun MessageSettingNav(navController: NavHostController, onDismissRequest: () -> Unit, onEditMsg: () -> Unit, onReaction: () -> Unit) {
+    NavHost(
+        navController = navController,
+        startDestination = MessageSettingScreens.General.route,
+    ) {
+        composable(MessageSettingScreens.General.route) {
+            MessageGeneralSetting(navController = navController, onEditMsg = onEditMsg, onDismissRequest = onDismissRequest, onReaction = onReaction)
+        }
+        composable(MessageSettingScreens.ChooseEmoji.route) {
+            MessageReactChooseEmoji(navController = navController, onReaction)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.S)
+@Composable
+fun MessageSetting(navController: NavHostController = rememberNavController(), onDismissRequest: () -> Unit, onEditMsg: () -> Unit, onReaction: () -> Unit) {
+    HarmonyTheme (isLightMode = false) {
+        ModalBottomSheet(
+            modifier = Modifier.fillMaxSize(),
+            onDismissRequest = onDismissRequest
+        ) {
+            MessageSettingNav(
+                navController = navController,
+                onDismissRequest = onDismissRequest,
+                onEditMsg = onEditMsg,
+                onReaction = onReaction
+            )
+        }
+    }
+}
+
+@Composable
+fun MessageGeneralSetting(navController: NavHostController, onEditMsg: () -> Unit, onDismissRequest: () -> Unit, onReaction:() -> Unit) {
+    val emojiList = listOf("👍", "❤\uFE0F", "\uD83D\uDE02", "\uD83C\uDF89", "\uD83C\uDF88", "\uD83E\uDD73")
+    LazyColumn (
+        modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)
+    ) {
+        item {
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                emojiList.forEach { emoji ->
+                    Button(
+                        modifier = Modifier.size(48.dp),
+                        shape = CircleShape,
+                        onClick = onReaction,
+                        contentPadding = PaddingValues(2.dp)
+                    ) {
+                        Text(
+                            text = emoji,
+                            style = TextStyle(
+                                fontSize = 20.sp
+                            )
+                        )
+                    }
+                }
+
+                Button(
+                    modifier = Modifier.size(48.dp),
+                    shape = CircleShape,
+                    onClick = {
+                        navController.navigate(
+                            MessageSettingScreens.ChooseEmoji.route
+                        )
+                    },
+                    contentPadding = PaddingValues(2.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.EmojiEmotions,
+                        contentDescription = ""
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = onEditMsg,
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = ""
+                    )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Chỉnh sửa tin nhắn",
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = onDismissRequest,
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Reply,
+                        contentDescription = ""
+                    )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Trả lời tin nhắn",
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = onDismissRequest,
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ForwardToInbox,
+                        contentDescription = ""
+                    )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Chuyển tiếp tin nhắn",
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable fun MessageReactChooseEmoji(navController: NavHostController, onReaction: () -> Unit) {
+    val emojiList = listOf(
+        "❤️",
+        "👍",
+        "👎",
+        "😂",
+        "👏",
+        "🙏",
+        "🔥",
+        "⭐",
+        "💯",
+        "🚀",
+        "✅",
+        "❌",
+        "❓",
+        "❗",
+        "➕",
+        "➖",
+        "🔗",
+        "🗑️",
+        "✏️",
+        "➡️",
+        "⬅️",
+        "⬆️",
+        "⬇️",
+        "🏠",
+        "⚙️",
+        "🔔",
+        "🔍",
+        "👤",
+        "💬",
+        "📍",
+        "🗺️",
+        "➕",
+        "➖",
+        "▶️",
+        "⏸️",
+        "⏹️",
+        "✉️",
+        "💡",
+        "📸",
+        "🎵",
+        "🎮",
+        "🛒",
+        "☕",
+        "📅",
+        "⏰"
+    )
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(7),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        items(emojiList.size) { index ->
+            Button(
+                modifier = Modifier.size(48.dp),
+                shape = CircleShape,
+                onClick = onReaction,
+                contentPadding = PaddingValues(2.dp)
+            ) {
+                Text(
+                    text = emojiList[index],
+                    style = TextStyle(
+                        fontSize = 20.sp
+                    )
+                )
+            }
+        }
+    }
+}
+
 class DirectMessage : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -322,6 +592,8 @@ fun BodyInfo() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageItem(
     message: Message,
@@ -433,80 +705,121 @@ fun MessageItem(
             zoneDT = "1 year ago"
         }
     }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+
+    var longClickShowMenu by remember{ mutableStateOf(false) }
+    if (longClickShowMenu) {
+//        MessageItemSetting(
+//            onDismissRequest = {
+//                longClickShowMenu = false
+//            },
+//            msgId = 1,
+//            onEditMsg = {
+//                longClickShowMenu = false
+//            }
+//        )
+        MessageSetting(
+            onDismissRequest = {
+                longClickShowMenu = false
+            },
+            onEditMsg = {
+                longClickShowMenu = false
+            },
+            onReaction = {
+                longClickShowMenu = false
+            }
+        )
+    }
+    Column (
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
-            .background(primaryGray)
-            .padding(horizontal = 8.dp, vertical = 16.dp)
     ) {
-        Image(
-            painter = avatar,
-            contentDescription = "Avatar",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .height(36.dp)
-                .width(36.dp)
-                .background(Color.Transparent)
-        )
-        Column(
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .background(Color.Transparent)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = message.senderName,
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontFamily = ggsans,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .wrapContentHeight()
-                        .background(Color.Transparent)
-                        .weight(1f)
+                .background(primaryGray)
+                .padding(horizontal = 8.dp, vertical = 16.dp)
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick = {
+                        longClickShowMenu = true
+                    }
                 )
+        ) {
+            Image(
+                painter = avatar,
+                contentDescription = "Avatar",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .height(36.dp)
+                    .width(36.dp)
+                    .background(Color.Transparent)
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .background(Color.Transparent)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = message.senderName,
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontFamily = ggsans,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .wrapContentHeight()
+                            .background(Color.Transparent)
+                            .weight(1f)
+                    )
+                    Text(
+                        text = zoneDT,
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        fontFamily = ggsans,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.Normal,
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .wrapContentHeight()
+                            .background(Color.Transparent)
+                            .alpha(0.5f)
+                    )
+                }
                 Text(
-                    text = zoneDT,
+                    text = message.text,
                     color = Color.White,
-                    fontSize = 10.sp,
+                    fontSize = 16.sp,
                     fontFamily = ggsans,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier
                         .padding(start = 8.dp)
                         .wrapContentHeight()
                         .background(Color.Transparent)
-                        .alpha(0.5f)
                 )
             }
-            Text(
-                text = message.text,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontFamily = ggsans,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .wrapContentHeight()
-                    .background(Color.Transparent)
-            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Row {
+
         }
     }
+
 }
 
 //@Preview(
 //    name = "Chat Messages",
 //    showBackground = true,
 //)
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BodyMessage() {
     val primaryGray = colorResource(id = R.color.primary_gray)
