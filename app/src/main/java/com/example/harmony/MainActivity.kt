@@ -12,9 +12,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val intent = Intent(this, DirectMessage::class.java)
-        startActivity(intent)
+
+        setContentView(R.layout.activity_main)
+//        val intent = Intent(this, PollCreation::class.java)
+//        val intent = Intent(this, ServerCreation::class.java)
+//        val intent = Intent(this, Search::class.java)
+//        val intent = Intent(this, DirectMessage::class.java)
+//        startActivity(intent)
     }
 }
