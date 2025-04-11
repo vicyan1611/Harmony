@@ -1,5 +1,8 @@
 package com.example.harmony
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -52,6 +55,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,6 +94,15 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.until
+import java.net.URL
+import android.util.Log
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalContext
+import coil3.compose.rememberAsyncImagePainter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 data class DateTime(
     val date: String,
@@ -102,10 +115,11 @@ data class Message(
     val text: String,
     val isUser: Boolean = false,
     val isEmoji: Boolean = false,
-    val isImage: Boolean = false,
-    val isVideo: Boolean = false,
+    val isImage: Boolean = false, // contain at least 1 image
     val isAudio: Boolean = false,
     val isFile: Boolean = false,
+    val isLink: Boolean = false,
+    val imagesList: List<Painter> = emptyList(),
     val senderName: String = "Username",
     val sentTime: DateTime = DateTime(
         date = "29-03-2025",
@@ -114,6 +128,29 @@ data class Message(
         dateTime = "00:00:00 29-03-2020"
     ),
 )
+
+fun extractFirstLink(text: String): String {
+    // Regex for matching URLs with http, https, or ftp protocols
+    val regex = "(?:^|\\s)(?:(?:https?|ftp)://)?(?:www\\.)?[a-zA-Z0-9-]+\\.[a-zA-Z]{2,}(?::\\d{1,5})?(?:[/?#][^\\s]*)?(?=$|\\s)"
+    val matchResult = regex.toRegex().find(text)
+    return matchResult?.value!!.trim() ?: ""
+}
+
+fun openLinkInBrowser(context: Context, url: String) {
+    try {
+        val normalizedUrl = if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            "https://$url"
+        } else {
+            url
+        }
+
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(normalizedUrl))
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Log.e("OpenLink", "Error opening link: ${e.message}")
+    }
+}
 
 sealed class MessageSettingScreens(val route: String, val label: String) {
     object General: MessageSettingScreens("message-setting/", "General") // top level
@@ -356,6 +393,7 @@ class DirectMessage : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("Check Extract: ", extractFirstLink("Here is the link to the project: www.example.com"))
         setContent {
             Column(modifier = Modifier.fillMaxSize()) {
                 val primaryGrayBright = colorResource(
@@ -595,9 +633,84 @@ fun BodyInfo() {
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+fun LinkPreview(
+    title: String,
+    description: String,
+    image: Painter,
+    url: String = "https://www.example.com",
+){
+    val context = LocalContext.current
+    ConstraintLayout(
+        modifier = Modifier.fillMaxWidth()
+            .wrapContentHeight()
+            .background(Color.Transparent)
+            .padding(8.dp)
+            .shadow(4.dp, CircleShape)
+            .clickable {
+                openLinkInBrowser(
+                    context = context,
+                    url = url
+                )
+            }
+    ) {
+        val (imageRef) = createRefs()
+        Image(
+            painter = image,
+            contentDescription = "Link Preview Image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(48.dp)
+                .width(48.dp)
+                .background(Color.Transparent)
+                .constrainAs(imageRef){
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    verticalBias = .5f
+                }
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .background(Color.Transparent)
+                .padding(start = 8.dp)
+                .constrainAs(createRef()){
+                    start.linkTo(imageRef.end, margin = 8.dp)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                    height = Dimension.wrapContent
+                }
+        ){
+            Text(
+                text = title,
+                color = Color.White,
+                fontSize = 16.sp,
+                fontFamily = ggsans,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = description,
+                color = Color.White,
+                fontSize = 12.sp,
+                fontFamily = ggsans,
+                fontWeight = FontWeight.Normal,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
 fun MessageItem(
     message: Message,
     avatar: Painter,
+    images: List<Painter> = emptyList(),
 ) {
     val primaryGray = colorResource(id = R.color.primary_gray)
     var zoneDT = "" // if SDK is 26+ then we can get the timezone from the message
@@ -815,10 +928,10 @@ fun MessageItem(
 
 }
 
-//@Preview(
-//    name = "Chat Messages",
-//    showBackground = true,
-//)
+@Preview(
+    name = "Chat Messages",
+    showBackground = true,
+)
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BodyMessage() {
@@ -853,7 +966,18 @@ fun BodyMessage() {
         Message("Okay, let's do it!", false, senderName = "Receiver"),
         Message("I will send you the details later.", false, senderName = "Receiver"),
         Message(":applaud:", true), // Emoji message, integrate later
-    )
+        Message(
+            "I have some images to share with you.",
+            true,
+            isImage = true,
+            imagesList = listOf(
+                painterResource(id = R.drawable.account),
+                painterResource(id = R.drawable.account),
+                painterResource(id = R.drawable.account)
+            )
+        ),
+        Message("Here is the link to the project: www.example.com", false, isLink = true),
+        )
     ConstraintLayout {
         val (messageRef) = createRefs()
         LazyColumn(
@@ -876,6 +1000,7 @@ fun BodyMessage() {
                         MessageItem(
                             message = message,
                             avatar = receiverAvt,
+                            images = message.imagesList
                         )
                     }
                 }
