@@ -706,6 +706,8 @@ fun LinkPreview(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageItem(
     message: Message,
