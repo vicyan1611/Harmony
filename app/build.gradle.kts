@@ -62,9 +62,7 @@ dependencies {
 
     //Dangger
     implementation("com.google.dagger:hilt-android:2.50")
-    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
-
-
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 
     // Android Studio Preview support
@@ -80,7 +78,7 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-    
+
 
 //    Firebase
     implementation(platform(libs.firebase.bom))

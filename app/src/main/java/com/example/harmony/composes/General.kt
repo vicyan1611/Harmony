@@ -26,16 +26,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
 import coil3.compose.AsyncImage
 
 @Composable
-fun RoundedContainer(modifier: Modifier = Modifier, size: Dp = 80.dp, content: @Composable BoxScope.() -> Unit) {
+fun RoundedContainer(
+    modifier: Modifier = Modifier,
+    size: Dp = 80.dp,
+    content: @Composable BoxScope.() -> Unit
+) {
     Box(
         modifier = modifier
             .size(size)
@@ -47,7 +49,14 @@ fun RoundedContainer(modifier: Modifier = Modifier, size: Dp = 80.dp, content: @
 }
 
 @Composable
-fun RoundedButton(modifier: Modifier = Modifier, size: Dp = 40.dp, onClick: () -> Unit, containerColor: Color = MaterialTheme.colorScheme.secondary, contentColor: Color = MaterialTheme.colorScheme.onSecondary, content: @Composable RowScope.() -> Unit) {
+fun RoundedButton(
+    modifier: Modifier = Modifier,
+    size: Dp = 40.dp,
+    onClick: () -> Unit,
+    containerColor: Color = MaterialTheme.colorScheme.secondary,
+    contentColor: Color = MaterialTheme.colorScheme.onSecondary,
+    content: @Composable RowScope.() -> Unit
+) {
     Button(
         onClick = onClick,
         colors = ButtonColors(
@@ -64,7 +73,12 @@ fun RoundedButton(modifier: Modifier = Modifier, size: Dp = 40.dp, onClick: () -
 }
 
 @Composable
-fun RoundedAvatar(modifier: Modifier = Modifier, size: Dp = 80.dp, avatarImageUrl: String = "", char: Char = ' ') {
+fun RoundedAvatar(
+    modifier: Modifier = Modifier,
+    size: Dp = 80.dp,
+    avatarImageUrl: String = "",
+    char: Char = ' '
+) {
     RoundedContainer(modifier = modifier, size = size) {
         if (avatarImageUrl.trim() == "") {
             Text(
@@ -86,20 +100,31 @@ fun RoundedAvatar(modifier: Modifier = Modifier, size: Dp = 80.dp, avatarImageUr
 }
 
 @Composable
-fun TextBox(modifier: Modifier = Modifier, minLines: Int = 1, maxLines: Int = 1, editable: Boolean = false, text: String = "", textStyle: TextStyle = LocalTextStyle.current, onValueChange: (String) -> Unit = {}, label: String = "", showCharsCounter: Boolean = false, maxChars: Int = Int.MAX_VALUE,
-            colors: TextFieldColors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                disabledContainerColor = MaterialTheme.colorScheme.tertiary,
-                focusedTextColor = MaterialTheme.colorScheme.onTertiary,
-                unfocusedTextColor = MaterialTheme.colorScheme.onTertiary,
-                disabledTextColor = MaterialTheme.colorScheme.onTertiary,
-                focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onTertiary,
-                disabledLabelColor = MaterialTheme.colorScheme.onTertiary,
-                cursorColor = MaterialTheme.colorScheme.onTertiary,
-                focusedIndicatorColor = MaterialTheme.colorScheme.onSecondary
-            )) {
+fun TextBox(
+    modifier: Modifier = Modifier,
+    minLines: Int = 1,
+    maxLines: Int = 1,
+    editable: Boolean = false,
+    text: String = "",
+    textStyle: TextStyle = LocalTextStyle.current,
+    onValueChange: (String) -> Unit = {},
+    label: String = "",
+    showCharsCounter: Boolean = false,
+    maxChars: Int = Int.MAX_VALUE,
+    colors: TextFieldColors = TextFieldDefaults.colors(
+        focusedContainerColor = MaterialTheme.colorScheme.tertiary,
+        unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
+        disabledContainerColor = MaterialTheme.colorScheme.tertiary,
+        focusedTextColor = MaterialTheme.colorScheme.onTertiary,
+        unfocusedTextColor = MaterialTheme.colorScheme.onTertiary,
+        disabledTextColor = MaterialTheme.colorScheme.onTertiary,
+        focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
+        unfocusedLabelColor = MaterialTheme.colorScheme.onTertiary,
+        disabledLabelColor = MaterialTheme.colorScheme.onTertiary,
+        cursorColor = MaterialTheme.colorScheme.onTertiary,
+        focusedIndicatorColor = MaterialTheme.colorScheme.onSecondary
+    )
+) {
     Box(modifier = modifier) {
         OutlinedTextField(
             value = text,

@@ -2,7 +2,6 @@ package com.example.harmony
 
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -39,13 +38,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.harmony.composes.TextBox
 import com.example.harmony.composes.ui.theme.HarmonyTheme
 
@@ -56,14 +52,16 @@ class PollCreation : AppCompatActivity() {
         enableEdgeToEdge()
         setContent {
 
-            HarmonyTheme (isLightMode = false) {
-                Scaffold (
+            HarmonyTheme(isLightMode = false) {
+                Scaffold(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.fillMaxSize()
-                )  { innerPadding ->
-                    Column (
-                        modifier = Modifier.fillMaxWidth().padding(top = innerPadding.calculateTopPadding())
+                ) { innerPadding ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = innerPadding.calculateTopPadding())
                     ) {
                         PollCreationHeader()
                         PollCreationBody()
@@ -78,8 +76,10 @@ class PollCreation : AppCompatActivity() {
 @Composable
 fun PollCreationHeader() {
     val activity = LocalActivity.current
-    Row (
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -123,9 +123,13 @@ fun PollCreationHeader() {
 @Composable
 fun PollCreationBody() {
     var question by remember { mutableStateOf("") }
-    val selections = mutableListOf<MutableState<String>>(remember {mutableStateOf("")}, remember {mutableStateOf("")})
-    LazyColumn (
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+    val selections = mutableListOf<MutableState<String>>(
+        remember { mutableStateOf("") },
+        remember { mutableStateOf("") })
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
     ) {
         // question
         item {
@@ -174,7 +178,10 @@ fun PollCreationBody() {
                 onClick = {
 //                    selections.add(remember { mutableStateOf("") })
                 },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).height(42.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .height(42.dp),
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSecondary,
@@ -194,15 +201,22 @@ fun PollCreationBody() {
 }
 
 @Composable
-fun PollCreationSelection(index: Int, onRemoveSelection: () -> Unit, text: String, onValueChange: (String) -> Unit) {
+fun PollCreationSelection(
+    index: Int,
+    onRemoveSelection: () -> Unit,
+    text: String,
+    onValueChange: (String) -> Unit
+) {
 //    var selection by remember { mutableStateOf("") }
-    Row (
+    Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextBox(
             maxLines = 1,
-            modifier = Modifier.fillMaxWidth().weight(1.0f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1.0f),
             label = "Lựa chọn ${index + 1}",
             editable = true,
             text = text,

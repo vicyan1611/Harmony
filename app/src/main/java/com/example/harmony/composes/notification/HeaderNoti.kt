@@ -1,6 +1,5 @@
 package com.example.harmony.composes.notification
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -43,7 +42,7 @@ import androidx.compose.ui.unit.dp
 fun HeaderNotification() {
     var showBottomSheet by remember { mutableStateOf(false) }
     var checkedRole by remember { mutableStateOf(true) }
-    var checkMention by remember { mutableStateOf(true ) }
+    var checkMention by remember { mutableStateOf(true) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
@@ -101,7 +100,8 @@ fun HeaderNotification() {
                         title = "Show Indirect Mentions",
                         subtitle = "@here and @everyone",
                         checked = checkMention,
-                        onCheckedChange = {checkMention = !checkMention
+                        onCheckedChange = {
+                            checkMention = !checkMention
                         }
                     )
 

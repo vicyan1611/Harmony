@@ -1,7 +1,7 @@
 package com.example.harmony.domain.repository
 
-import com.example.harmony.domain.model.User
 import com.example.harmony.core.common.Resource
+import com.example.harmony.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {

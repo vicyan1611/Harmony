@@ -40,14 +40,14 @@ fun Sidebar(
                 .width(60.dp)
                 .height(60.dp)
                 .clip(
-                    if(!isClicked.value) {
+                    if (!isClicked.value) {
                         RoundedCornerShape(30.dp)
                     } else {
                         RoundedCornerShape(15.dp)
                     }
                 )
                 .background(
-                    if(!isClicked.value) {
+                    if (!isClicked.value) {
                         colorResource(id = R.color.primary_gray_light)
                     } else {
                         colorResource(id = R.color.primary_blurple)
@@ -58,7 +58,7 @@ fun Sidebar(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .clickable{
+                .clickable {
                     isClicked.value = !isClicked.value
                 }
         ) {
@@ -69,7 +69,7 @@ fun Sidebar(
                     .width(40.dp)
                     .height(40.dp)
                     .background(
-                        if(!isClicked.value) {
+                        if (!isClicked.value) {
                             colorResource(id = R.color.primary_gray_light)
                         } else {
                             colorResource(id = R.color.primary_blurple)
@@ -109,8 +109,7 @@ fun Sidebar(
                     .width(20.dp)
                     .height(20.dp)
                     .background(colorResource(id = R.color.primary_gray_light))
-                    .align(Alignment.Center)
-                ,
+                    .align(Alignment.Center),
                 colorFilter = ColorFilter.tint(
                     color = colorResource(id = R.color.primary_green)
                 ),

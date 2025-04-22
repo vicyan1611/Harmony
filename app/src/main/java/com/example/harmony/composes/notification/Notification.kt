@@ -79,7 +79,8 @@ fun DiscordNotification(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick).pointerInput(Unit) {
+            .clickable(onClick = onClick)
+            .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = { showDeleteOptions = true }
                 )
@@ -223,10 +224,6 @@ fun DeleteOption(
 }
 
 
-
-
-
-
 // section header for notification groups
 @Composable
 fun SectionHeader(title: String) {
@@ -289,49 +286,51 @@ fun NotificationScreen() {
     }
 
     var selectedTab by remember { mutableStateOf(1) } // Default to Notifications tab
-    var notifications by remember {mutableStateOf (notificationItems)}
+    var notifications by remember { mutableStateOf(notificationItems) }
 
     Scaffold(
-        bottomBar = { FooterNavigation(selectedTab, onTabSelected = {
-            selectedTab = it
-            Log.d("Debug From On tab", "tab $it")
-        }) }
+        bottomBar = {
+            FooterNavigation(selectedTab, onTabSelected = {
+                selectedTab = it
+                Log.d("Debug From On tab", "tab $it")
+            })
+        }
     ) { paddingValues ->
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                color = Color(0xFF36393F) // Discord dark theme background
-            ) {
-                Column {
-                    HeaderNotification()
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            color = Color(0xFF36393F) // Discord dark theme background
+        ) {
+            Column {
+                HeaderNotification()
 
-                    LazyColumn {
-                            item { SectionHeader("Recent Activity") }
+                LazyColumn {
+                    item { SectionHeader("Recent Activity") }
 
-                            items(notifications) { item ->
-                                DiscordNotification(
-                                    channelName = item.channelName,
-                                    message = item.message,
-                                    timestamp = item.timestamp,
-                                    avatarUrl = item.avatarUrl,
-                                    isMention = item.isMention,
-                                    onClick = {},
-                                    onDelete = {
-                                        Log.d("Debug From Delete call back", "Delete")
-                                        notifications = notifications.filter { it != item }
-                                    }
-                                )
-
-                                Divider(
-                                    modifier = Modifier.padding(start = 60.dp),
-                                    color = Color(0xFF42464D)
-                                )
+                    items(notifications) { item ->
+                        DiscordNotification(
+                            channelName = item.channelName,
+                            message = item.message,
+                            timestamp = item.timestamp,
+                            avatarUrl = item.avatarUrl,
+                            isMention = item.isMention,
+                            onClick = {},
+                            onDelete = {
+                                Log.d("Debug From Delete call back", "Delete")
+                                notifications = notifications.filter { it != item }
                             }
-                        }
+                        )
+
+                        Divider(
+                            modifier = Modifier.padding(start = 60.dp),
+                            color = Color(0xFF42464D)
+                        )
+                    }
                 }
             }
         }
+    }
 }
 
 @Preview(showBackground = true)

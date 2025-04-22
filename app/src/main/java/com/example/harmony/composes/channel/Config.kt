@@ -55,8 +55,8 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 sealed class ChannelConfigScreens(val route: String, val label: String) {
-    object General: ChannelConfigScreens("channel-config/", "General") // top level
-    object Settings: ChannelConfigScreens("channel-config/settings", "Settings")
+    object General : ChannelConfigScreens("channel-config/", "General") // top level
+    object Settings : ChannelConfigScreens("channel-config/settings", "Settings")
 }
 
 val seederParticipants = listOf<String>(
@@ -82,8 +82,13 @@ val seederParticipants = listOf<String>(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChannelConfigMenus(modifier: Modifier = Modifier, channelName: String = "", channelDescription: String = "", onDismissRequest: () -> Unit) {
-    ModalBottomSheet (
+fun ChannelConfigMenus(
+    modifier: Modifier = Modifier,
+    channelName: String = "",
+    channelDescription: String = "",
+    onDismissRequest: () -> Unit
+) {
+    ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier
             .fillMaxWidth(),
@@ -101,7 +106,11 @@ fun ChannelConfigMenus(modifier: Modifier = Modifier, channelName: String = "", 
 
 @OptIn(ExperimentalUuidApi::class)
 @Composable
-fun ChannelConfigNavigation(channelName: String = "", onDismissRequest: () -> Unit = {}, channelDescription: String = "") {
+fun ChannelConfigNavigation(
+    channelName: String = "",
+    onDismissRequest: () -> Unit = {},
+    channelDescription: String = ""
+) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -128,13 +137,19 @@ fun ChannelConfigNavigation(channelName: String = "", onDismissRequest: () -> Un
 
 @OptIn(ExperimentalUuidApi::class)
 @Composable
-fun ChannelConfigGeneralScreen(modifier: Modifier = Modifier, channelName: String = "", navController: NavHostController) {
-    Column (
+fun ChannelConfigGeneralScreen(
+    modifier: Modifier = Modifier,
+    channelName: String = "",
+    navController: NavHostController
+) {
+    Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // channel name
-        Row (
-            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
@@ -147,15 +162,17 @@ fun ChannelConfigGeneralScreen(modifier: Modifier = Modifier, channelName: Strin
         }
 
         // buttons
-        Row (
+        Row(
             horizontalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 12.dp)
         ) {
-            Column (
+            Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                RoundedButton (
+                RoundedButton(
                     size = 40.dp,
                     onClick = {
 
@@ -179,11 +196,11 @@ fun ChannelConfigGeneralScreen(modifier: Modifier = Modifier, channelName: Strin
                 )
             }
 
-            Column (
+            Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                RoundedButton (
+                RoundedButton(
                     size = 40.dp,
                     onClick = {
                         navController.navigate(ChannelConfigScreens.Settings.route)
@@ -210,7 +227,9 @@ fun ChannelConfigGeneralScreen(modifier: Modifier = Modifier, channelName: Strin
 
         // title: Member
         Text(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             text = stringResource(R.string.channel_config_memberList_title),
             style = TextStyle(
                 fontWeight = FontWeight.SemiBold,
@@ -225,15 +244,17 @@ fun ChannelConfigGeneralScreen(modifier: Modifier = Modifier, channelName: Strin
         )
 
         // list of members
-        Row (
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
-            LazyColumn (
+            LazyColumn(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 var cnt = 0
                 item {
-                    Card (
+                    Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(
@@ -241,8 +262,10 @@ fun ChannelConfigGeneralScreen(modifier: Modifier = Modifier, channelName: Strin
                         )
                     ) {
                         seederParticipants.forEachIndexed { idx, url ->
-                            Row (
-                                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
@@ -277,7 +300,14 @@ fun ChannelConfigGeneralScreen(modifier: Modifier = Modifier, channelName: Strin
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalUuidApi::class)
 @Composable
-fun ChannelSettingsScreen(modifier: Modifier = Modifier, onDismissRequest: () -> Unit = {}, channelName: String = "", channelDescription: String = "", channelPermission: List<Uuid> = listOf(), navController: NavHostController) {
+fun ChannelSettingsScreen(
+    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit = {},
+    channelName: String = "",
+    channelDescription: String = "",
+    channelPermission: List<Uuid> = listOf(),
+    navController: NavHostController
+) {
     var cnName by remember { mutableStateOf(channelName) }
     var cnDescription by remember { mutableStateOf(channelDescription) }
 //    ModalBottomSheet(
@@ -293,10 +323,12 @@ fun ChannelSettingsScreen(modifier: Modifier = Modifier, onDismissRequest: () ->
 
     Column {
         // header (pinned to top): Cancel - Title - Save
-        Row (
+        Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 12.dp)
         ) {
             // button go back
             Button(
@@ -349,7 +381,7 @@ fun ChannelSettingsScreen(modifier: Modifier = Modifier, onDismissRequest: () ->
                 )
             }
         }
-        LazyColumn (
+        LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = rememberLazyListState(),
             contentPadding = PaddingValues(vertical = 8.dp, horizontal = 6.dp),
@@ -390,7 +422,7 @@ fun ChannelSettingsScreen(modifier: Modifier = Modifier, onDismissRequest: () ->
 
             // delete channel
             item {
-                TextButton (
+                TextButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {},
                     contentPadding = PaddingValues(12.dp),
@@ -402,7 +434,7 @@ fun ChannelSettingsScreen(modifier: Modifier = Modifier, onDismissRequest: () ->
                         disabledContainerColor = Color.LightGray
                     )
                 ) {
-                    Row (
+                    Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {

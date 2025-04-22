@@ -34,7 +34,16 @@ import com.example.harmony.composes.TextBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfileLayout(displayedName: String = "", username: String = "", bio: String = "", modifier: Modifier, avatarUrl: String = "", onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit, bodyContent: @Composable RowScope.() -> Unit) {
+fun UserProfileLayout(
+    displayedName: String = "",
+    username: String = "",
+    bio: String = "",
+    modifier: Modifier,
+    avatarUrl: String = "",
+    onDismissRequest: () -> Unit,
+    headerContent: @Composable RowScope.() -> Unit,
+    bodyContent: @Composable RowScope.() -> Unit
+) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier
@@ -44,7 +53,7 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary
     ) {
-        Column (
+        Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
             modifier = Modifier
@@ -53,21 +62,25 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
                 .verticalScroll(rememberScrollState())
         ) {
             // interactive buttons on top
-            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()){
+            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                 headerContent()
             }
 
             // user info: avatar, name, username, bio
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column (
+                Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    RoundedAvatar(size = 64.dp, char = displayedName.getOrElse(0) { ' ' }.uppercaseChar(), avatarImageUrl = avatarUrl)
+                    RoundedAvatar(
+                        size = 64.dp,
+                        char = displayedName.getOrElse(0) { ' ' }.uppercaseChar(),
+                        avatarImageUrl = avatarUrl
+                    )
                     Text(
                         text = displayedName,
                         style = TextStyle(
@@ -75,7 +88,10 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
                             fontSize = 24.sp
                         )
                     )
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = username,
                             style = TextStyle(
@@ -84,10 +100,12 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
                             )
                         )
 
-                        Box(modifier = Modifier
-                            .size(16.dp)
-                            .clip(CircleShape)
-                            .background(Color.Green), contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier
+                                .size(16.dp)
+                                .clip(CircleShape)
+                                .background(Color.Green), contentAlignment = Alignment.Center
+                        ) {
                             Text(
                                 text = "#",
                                 style = TextStyle(
@@ -113,7 +131,7 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
 //                    lineHeight = 24.sp
 //                )
 //            )
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
@@ -121,7 +139,7 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
                         horizontal = 4.dp
                     )
             ) {
-                Column (
+                Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
@@ -133,7 +151,7 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
                         )
                     )
 
-                    TextBox (
+                    TextBox(
                         modifier = Modifier.fillMaxWidth(),
                         editable = false,
                         text = bio,
@@ -148,7 +166,7 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
 
             }
             // body
-            Row (
+            Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 bodyContent()

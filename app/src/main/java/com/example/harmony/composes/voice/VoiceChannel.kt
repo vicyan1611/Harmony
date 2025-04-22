@@ -41,7 +41,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -299,7 +298,6 @@ fun YourScreen() {
 }
 
 
-
 // Model class
 data class VoiceParticipant(
     val name: String,
@@ -313,14 +311,14 @@ val voiceParticipants = listOf(
     VoiceParticipant("User C", "file:///android_asset/cat.jpg"),
     VoiceParticipant("User 🦆", "file:///android_asset/cat.jpg", true),
     VoiceParticipant("User A", "file:///android_asset/cat.jpg"),
-    VoiceParticipant("User CA", "file:///android_asset/cat.jpg") ,
+    VoiceParticipant("User CA", "file:///android_asset/cat.jpg"),
     VoiceParticipant("User BA", "file:///android_asset/cat.jpg")
 )
 
 @Preview
 @Composable
 fun VoiceChannelBottomSheetPreview() {
-    MaterialTheme{
+    MaterialTheme {
         YourScreen()
     }
 }

@@ -70,7 +70,7 @@ class AuthRepositoryImpl @Inject constructor(
             photoUrl = firebaseUser.photoUrl?.toString()
         )
     }
-    
+
     override fun isUserAuthenticated(): Boolean {
         return auth.currentUser != null
     }

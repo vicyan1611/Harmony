@@ -11,7 +11,16 @@ import androidx.compose.ui.unit.dp
 import com.example.harmony.composes.RoundedButton
 
 @Composable
-fun MyProfile(displayedName: String = "", username: String = "", bio: String = "", avatarUrl: String = "", modifier: Modifier, onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit = {}, bodyContent: @Composable RowScope.() -> Unit = {}) {
+fun MyProfile(
+    displayedName: String = "",
+    username: String = "",
+    bio: String = "",
+    avatarUrl: String = "",
+    modifier: Modifier,
+    onDismissRequest: () -> Unit,
+    headerContent: @Composable RowScope.() -> Unit = {},
+    bodyContent: @Composable RowScope.() -> Unit = {}
+) {
     UserProfileLayout(
         displayedName = displayedName,
         username = username,

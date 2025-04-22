@@ -51,8 +51,9 @@ class Search : ComponentActivity() {
                     .background(colorResource(id = R.color.primary_gray))
             ) {
                 SearchHeader()
-                Box(modifier = Modifier
-                    .fillMaxSize()
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
                 ) {
                     SearchBody()
                 }
@@ -134,7 +135,7 @@ fun SearchItem() {
             .fillMaxWidth()
             .height(100.dp)
             .padding(horizontal = 4.dp, vertical = 8.dp)
-            .clickable{ /* TODO: Handle click action */ }
+            .clickable { /* TODO: Handle click action */ }
             .padding(8.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(colorResource(id = R.color.primary_gray_light))

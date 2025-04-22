@@ -39,7 +39,17 @@ import com.example.harmony.R
 import com.example.harmony.composes.RoundedButton
 
 @Composable
-fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend: Boolean = false, bio: String = "", modifier: Modifier, avatarUrl: String = "", onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit = {}, bodyContent: @Composable RowScope.() -> Unit = {}) {
+fun OtherUserProfile(
+    displayedName: String = "",
+    username: String = "",
+    isFriend: Boolean = false,
+    bio: String = "",
+    modifier: Modifier,
+    avatarUrl: String = "",
+    onDismissRequest: () -> Unit,
+    headerContent: @Composable RowScope.() -> Unit = {},
+    bodyContent: @Composable RowScope.() -> Unit = {}
+) {
     UserProfileLayout(
         displayedName = displayedName,
         username = username,
@@ -70,7 +80,9 @@ fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 2.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp, horizontal = 2.dp)
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -96,7 +108,10 @@ fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend
                     )
                 }
 
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     RoundedButton(
                         onClick = {},
                         size = 48.dp
@@ -116,7 +131,10 @@ fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend
                     )
                 }
 
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     RoundedButton(
                         onClick = {},
                         size = 48.dp
@@ -137,7 +155,10 @@ fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend
                 }
 
                 if (!isFriend) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         RoundedButton(
                             onClick = {},
                             size = 48.dp
@@ -205,7 +226,7 @@ fun UnfriendDialog(state: MutableState<Boolean>, displayedName: String = "") {
                         textAlign = TextAlign.Center
                     )
                 )
-                Column (
+                Column(
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     TextButton(

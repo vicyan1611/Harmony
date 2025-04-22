@@ -4,15 +4,15 @@
         android:font="@font/abcgintodiscordnord_bold"
         android:fontStyle="normal"
         android:fontWeight="700" />
-        />
+    />
     <font
         android:font="@font/abcgintodiscordnord_bolditalic"
         android:fontStyle="italic"
         android:fontWeight="700" />
-        />
+    />
     <font
         android:font="@font/abcgintodiscordnord_blackitalic"
         android:fontStyle="italic"
         android:fontWeight="900" />
-        />
+    />
 </font-family>

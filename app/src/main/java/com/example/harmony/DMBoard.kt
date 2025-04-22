@@ -70,7 +70,7 @@ fun ChatItem() {
                     top.linkTo(parent.top)
                     start.linkTo(profile.end, 8.dp)
                 }
-        ){
+        ) {
             Text(
                 text = "User Name",
                 fontSize = 16.sp,
@@ -78,7 +78,7 @@ fun ChatItem() {
                 fontWeight = FontWeight.Bold,
                 color = colorResource(id = R.color.primary_gray_bright),
             )
-            Row{
+            Row {
                 Text(
                     text = "Last message",
                     fontSize = 14.sp,

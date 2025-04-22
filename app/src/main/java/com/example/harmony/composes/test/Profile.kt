@@ -39,7 +39,11 @@ class Profile : ComponentActivity() {
             var showServerCreation by remember { mutableStateOf(false) }
             HarmonyTheme(isLightMode = false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Row (modifier = Modifier.padding(top = 30.dp, start = 10.dp, end = 10.dp).fillMaxSize()) {
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 30.dp, start = 10.dp, end = 10.dp)
+                            .fillMaxSize()
+                    ) {
                         Button(onClick = {
                             showBottomSheet_other = true
                         }) {
@@ -64,7 +68,7 @@ class Profile : ComponentActivity() {
                         }
 
                         if (showBottomSheet_other) {
-                            OtherUserProfile (
+                            OtherUserProfile(
                                 displayedName = "ketamean",
                                 username = "_ketamean",
                                 isFriend = true,
@@ -77,7 +81,7 @@ class Profile : ComponentActivity() {
                         }
 
                         if (showBottomSheet_mine) {
-                            MyProfile (
+                            MyProfile(
                                 displayedName = "ketamean",
                                 username = "_ketamean",
                                 bio = "Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean Hello, I'm ketamean",
@@ -90,7 +94,7 @@ class Profile : ComponentActivity() {
                         }
 
                         if (channelSettingSheet) {
-                            ChannelConfigMenus (
+                            ChannelConfigMenus(
                                 modifier = Modifier.fillMaxSize(),
                                 channelName = "#hehe",
                                 channelDescription = "Đây là channel mà tôi đã tạo. Đây là channel mà tôi đã tạo. Đây là channel mà tôi đã tạo. Đây là channel mà tôi đã tạo. Đây là channel mà tôi đã tạo. Đây là channel mà tôi đã tạo.",
@@ -111,12 +115,15 @@ class Profile : ComponentActivity() {
 }
 
 
-
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
     var showBottomSheet_other by remember { mutableStateOf(false) }
-    Scaffold(modifier = Modifier.fillMaxSize().padding(top = 30.dp, start = 10.dp, end = 10.dp)) { innerPadding ->
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 30.dp, start = 10.dp, end = 10.dp)
+    ) { innerPadding ->
         Button(onClick = {
             showBottomSheet_other = true
         }) {
@@ -124,7 +131,7 @@ fun Preview() {
             // Icon(Icons.Filled.Add, contentDescription = "click to show modal btm sheet")
         }
         if (showBottomSheet_other) {
-            OtherUserProfile (
+            OtherUserProfile(
                 displayedName = "ketamean",
                 username = "_ketamean",
                 isFriend = true,

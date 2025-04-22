@@ -8,7 +8,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -36,8 +35,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,14 +52,12 @@ import androidx.navigation.compose.rememberNavController
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import com.example.harmony.R
-import com.example.harmony.composes.TextBox
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import com.example.harmony.composes.ShareText
+import com.example.harmony.composes.TextBox
 
 sealed class ServerCreationScreen(val route: String, val label: String) {
-    object ServerName: ServerCreationScreen("server/creation/name", "Name")
-    object ServerInvite: ServerCreationScreen("server/creation/invite", "Invite")
+    object ServerName : ServerCreationScreen("server/creation/name", "Name")
+    object ServerInvite : ServerCreationScreen("server/creation/invite", "Invite")
 }
 
 @Composable
@@ -82,11 +81,11 @@ fun ServerCreationInvite(navController: NavHostController, url: String = "http:/
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
     val activity = context as? ComponentActivity
-    Column (
+    Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         // skip button
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
@@ -253,7 +252,7 @@ fun ServerCreationName(navController: NavHostController) {
     var serverName by remember { mutableStateOf("") }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     // header
-    Column (
+    Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         // title
