@@ -19,6 +19,8 @@ lifecycleRuntimeKtx = "2.6.1"
 navigationCompose = "2.8.9"
 navigationFragmentKtx = "2.8.9"
 navigationUiKtx = "2.8.9"
+composeBom = "2024.09.00"
+media3CommonKtx = "1.6.0"
 
 [libraries]
 androidlinkview = { module = "com.github.lukasroberts:AndroidLinkView", version.ref = "androidlinkview" }
@@ -50,6 +52,7 @@ androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
+androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -46,6 +46,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.media3.common.ktx)
     // Jetpack Compose
     val composeBom = platform("androidx.compose:compose-bom:2025.02.00")
     implementation(composeBom)
@@ -54,6 +56,14 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.navigation.compose)
+
+    //Dangger
+    implementation("com.google.dagger:hilt-android:2.50")
+    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+
+
+
     // Android Studio Preview support
     implementation(libs.androidx.ui.tooling.preview)
     debugImplementation(libs.ui.tooling)
