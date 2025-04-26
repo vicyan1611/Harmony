@@ -45,6 +45,7 @@ class AuthRepositoryImpl @Inject constructor(
                 firestore.collection(USERS_COLLECTION).document(userId).set(user).await()
                 emit(Resource.Success<User>(user))
             } catch (e: Exception) {
+
                 emit(Resource.Error(e.localizedMessage ?: ERROR_SOMETHING_WENT_WRONG))
             }
         }

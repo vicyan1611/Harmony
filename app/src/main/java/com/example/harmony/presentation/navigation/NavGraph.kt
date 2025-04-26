@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.harmony.presentation.auth.login.LoginScreen
 import com.example.harmony.presentation.auth.register.RegisterScreen
 import com.example.harmony.presentation.auth.splash.SplashScreen
+import com.example.harmony.presentation.main.home.HomeScreen
 
 @Composable
 fun NavGraph(
@@ -62,17 +63,23 @@ fun NavGraph(
             )
         }
 
-        // Main Screens
-//        composable(route = NavRoutes.HOME) {
-//            HomeScreen(
+//         Main Screens
+        composable(route = NavRoutes.HOME) {
+            HomeScreen(
 //                onNavigateToServerDetail = { serverId ->
 //                    navController.navigate(NavRoutes.getServerDetailRoute(serverId))
 //                },
 //                onNavigateToProfile = {
 //                    navController.navigate(NavRoutes.PROFILE)
 //                }
-//            )
-//        }
+                onNavigateToLogin = {
+                    navController.navigate(NavRoutes.LOGIN) {
+                        popUpTo(NavRoutes.HOME) {inclusive = true}
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
 //
 //        composable(
 //            route = NavRoutes.SERVER_DETAIL,

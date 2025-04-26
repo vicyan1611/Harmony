@@ -139,7 +139,7 @@ fun LoginScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { viewModel.onEvent(LoginEvent.OnRegisterClick) }
+                    .clickable { onNavigateToRegister() }
                     .padding(8.dp)
             )
         }
