@@ -98,9 +98,9 @@ fun HarmonyTextField(
 @Composable
 fun HarmonyTextFieldPreview() {
     HarmonyTheme {
-        HarmonyTextField(
-            value = "Email",
-            onValueChange = {}
+        HarmonyButton(
+            text = "Login",
+            onClick = {}
         )
     }
 }
