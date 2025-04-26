@@ -3,7 +3,6 @@ package com.example.harmony.presentation.main.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.harmony.core.common.Resource
-import com.example.harmony.domain.model.User
 import com.example.harmony.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
