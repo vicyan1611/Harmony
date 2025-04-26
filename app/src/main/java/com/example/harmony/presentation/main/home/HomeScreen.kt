@@ -12,18 +12,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.harmony.core.components.HarmonyButton
+import com.example.harmony.presentation.navigation.NavRoutes
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeScreen(
+    onNavigateToLogin: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val isLoggingOut by viewModel.isLoggingOut.collectAsState()
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.navigationEvent.collectLatest { route ->
+            if (route == NavRoutes.LOGIN) {
+                onNavigateToLogin()
+            }
+        }
+    }
 
     Scaffold { paddingValues ->
         Box(
@@ -58,6 +72,14 @@ fun HomeScreen(
                     Text(
                         text = "(Email: ${state.user?.email ?: "N/A"})",
                         style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    HarmonyButton(
+                        text = "Logout",
+                        onClick = { viewModel.logout() },
+                        isLoading = isLoggingOut,
+                        enabled = !isLoggingOut
                     )
                 }
             }

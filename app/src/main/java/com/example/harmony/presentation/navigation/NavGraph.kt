@@ -72,6 +72,12 @@ fun NavGraph(
 //                onNavigateToProfile = {
 //                    navController.navigate(NavRoutes.PROFILE)
 //                }
+                onNavigateToLogin = {
+                    navController.navigate(NavRoutes.LOGIN) {
+                        popUpTo(NavRoutes.HOME) {inclusive = true}
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 //
