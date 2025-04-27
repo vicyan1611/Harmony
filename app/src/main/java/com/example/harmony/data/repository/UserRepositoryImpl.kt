@@ -1,7 +1,8 @@
-// data/repository/UserRepositoryImpl.kt
+// harmony/data/repository/UserRepositoryImpl.kt
 package com.example.harmony.data.repository
 
 import android.net.Uri
+import android.util.Log // Import Log
 import com.example.harmony.core.common.Constants.ERROR_SOMETHING_WENT_WRONG
 import com.example.harmony.core.common.Constants.USERS_COLLECTION
 import com.example.harmony.core.common.Resource
@@ -10,6 +11,7 @@ import com.example.harmony.domain.model.UserSettings
 import com.example.harmony.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration // Import ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
@@ -25,42 +27,57 @@ class UserRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val storage: FirebaseStorage
 ) : UserRepository {
+
+    // This flow now primarily focuses on listening to Firestore *if* the user is logged in when called.
+    // It will emit an error and complete if the user is not logged in at call time.
     override fun getUser(): Flow<Resource<User>> = callbackFlow {
-        trySend(Resource.Loading())
+        trySend(Resource.Loading()) // Start with loading
 
         val userId = auth.currentUser?.uid
         if (userId == null) {
+            Log.d("UserRepositoryImpl", "getUser: User not logged in, sending error.")
             trySend(Resource.Error("User not logged in"))
-            awaitClose { }
+            close() // Close the flow as there's nothing more to listen to *for this specific call*
             return@callbackFlow
         }
 
+        Log.d("UserRepositoryImpl", "getUser: User logged in ($userId), attaching Firestore listener.")
         val userRef = firestore.collection(USERS_COLLECTION).document(userId)
+        var listenerRegistration: ListenerRegistration? = null // Define here
 
-        val listenerRegistration = userRef.addSnapshotListener { snapshot, error ->
+        listenerRegistration = userRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
+                Log.e("UserRepositoryImpl", "getUser: Firestore listener error", error)
                 trySend(Resource.Error(error.localizedMessage ?: ERROR_SOMETHING_WENT_WRONG))
-                close(error) // Close the flow on error
+                // Optionally close on persistent errors, but maybe let it retry?
+                // close(error)
                 return@addSnapshotListener
             }
 
             if (snapshot != null && snapshot.exists()) {
                 val user = snapshot.toObject(User::class.java)?.copy(id = snapshot.id)
                 if (user != null) {
+                    Log.d("UserRepositoryImpl", "getUser: Sending user data: ${user.displayName}")
                     trySend(Resource.Success(user))
                 } else {
+                    Log.w("UserRepositoryImpl", "getUser: Failed to parse user data from snapshot.")
                     trySend(Resource.Error("Failed to parse user data"))
                 }
             } else {
+                // Snapshot might be null briefly during setup or if document deleted
+                Log.w("UserRepositoryImpl", "getUser: User document does not exist for user $userId.")
                 trySend(Resource.Error("User document does not exist"))
             }
         }
 
-        // Close the listener when the flow is cancelled
-        awaitClose { listenerRegistration.remove() }
+        // This is crucial: close the Firestore listener when the flow collection stops.
+        awaitClose {
+            Log.d("UserRepositoryImpl", "getUser: Closing Firestore listener for user $userId.")
+            listenerRegistration?.remove()
+        }
     }
 
-     override fun updateProfile(displayName: String?, avatarUri: Uri?): Flow<Resource<User>> = flow {
+    override fun updateProfile(displayName: String?, avatarUri: Uri?): Flow<Resource<User>> = flow {
         emit(Resource.Loading())
 
         val userId = auth.currentUser?.uid
@@ -95,10 +112,10 @@ class UserRepositoryImpl @Inject constructor(
 
             // 4. Perform Firestore Update (if there are changes)
             if (updates.isNotEmpty()) {
+                Log.d("UserRepositoryImpl", "updateProfile: Updating profile with: $updates")
                 userRef.set(updates, SetOptions.merge()).await() // Use set with merge to only update specified fields
             } else {
-                // No updates were actually staged, maybe return current data or specific message
-                // Fetching current data anyway to ensure consistency
+                Log.d("UserRepositoryImpl", "updateProfile: No profile changes detected.")
             }
 
             // 5. Fetch and return the updated user data
@@ -106,12 +123,15 @@ class UserRepositoryImpl @Inject constructor(
             val updatedUser = updatedSnapshot.toObject(User::class.java)?.copy(id = updatedSnapshot.id)
 
             if (updatedUser != null) {
+                Log.d("UserRepositoryImpl", "updateProfile: Successfully updated and returning user.")
                 emit(Resource.Success(updatedUser))
             } else {
+                Log.w("UserRepositoryImpl", "updateProfile: Failed to fetch updated user data after update.")
                 emit(Resource.Error("Failed to fetch updated user data after update"))
             }
 
         } catch (e: Exception) {
+            Log.e("UserRepositoryImpl", "updateProfile: Error updating profile", e)
             emit(Resource.Error(e.localizedMessage ?: "Failed to update profile"))
         }
     }
@@ -125,9 +145,11 @@ class UserRepositoryImpl @Inject constructor(
         try {
             val userRef = firestore.collection(USERS_COLLECTION).document(userId)
             val settingsWithTimestamp = newSettings.copy(updatedAt = System.currentTimeMillis())
+            Log.d("UserRepositoryImpl", "updateUserSettings: Updating settings for user $userId: $settingsWithTimestamp")
             userRef.update("settings", settingsWithTimestamp).await()
             emit(Resource.Success(settingsWithTimestamp))
         } catch (e: Exception) {
+            Log.e("UserRepositoryImpl", "updateUserSettings: Error updating settings", e)
             emit(Resource.Error(e.localizedMessage ?: "Failed to update settings"))
         }
     }

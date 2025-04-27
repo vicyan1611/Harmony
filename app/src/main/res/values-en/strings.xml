@@ -49,4 +49,7 @@
     <string name="app_language_label">App Language</string>
     <string name="profile_avatar_description">Profile Avatar</string>
     <string name="select_avatar_action">Select avatar</string>
+    <string name="profile_information_title">Profile Information</string>
+    <string name="app_settings_title">App Settings</string>
+    <string name="error_user_not_logged_in">User not logged in. Please log in to continue.</string>
 </resources>

@@ -50,4 +50,7 @@
     <string name="app_language_label">Ngôn ngữ ứng dụng</string>
     <string name="profile_avatar_description">Ảnh đại diện hồ sơ</string>
     <string name="select_avatar_action">Chọn ảnh đại diện</string>
+    <string name="profile_information_title">Thông Tin Hồ Sơ</string>
+    <string name="app_settings_title">Cài Đặt Ứng Dụng</string>
+    <string name="error_user_not_logged_in">Người dùng chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.</string>
 </resources>
