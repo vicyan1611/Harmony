@@ -126,7 +126,8 @@ fun HomeScreen(
                     onUserSettingsClick = { viewModel.onEvent(HomeEvent.OnLogoutClicked) },
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.3f)
+                        .weight(0.3f),
+                    isHost = state.selectedServer?.server?.ownerId != null && state.user?.id != null && state.selectedServer?.server?.ownerId == state.user?.id
                 )
             }
 
