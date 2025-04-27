@@ -23,8 +23,8 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
 
     fun onEvent(event: RegisterEvent) {
         when (event) {
-            is RegisterEvent.OnUsernameChange -> {
-                _state.update { it.copy(username = event.username) }
+            is RegisterEvent.OnDisplayNameChange -> {
+                _state.update { it.copy(displayName = event.displayName) }
             }
 
             is RegisterEvent.OnEmailChange -> {
@@ -50,12 +50,12 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
     }
 
     private fun register() {
-        val username = state.value.username
+        val displayName = state.value.displayName
         val email = state.value.email
         val password = state.value.password
         val confirmPassword = state.value.confirmPassword
 
-        if (username.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+        if (displayName.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
             _state.update { it.copy(error = ERROR_FIELDS_EMPTY) }
             return
         }
@@ -65,7 +65,7 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
             return
         }
 
-        registerUseCase(username, email, password).onEach { result ->
+        registerUseCase(displayName, email, password).onEach { result ->
             when (result) {
                 is Resource.Loading<User> -> {
                     _state.update { it.copy(isLoading = true, error = null) }

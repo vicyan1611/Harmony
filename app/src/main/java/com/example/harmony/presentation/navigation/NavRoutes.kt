@@ -11,6 +11,7 @@ object NavRoutes {
     const val CREATE_SERVER = "create_server/"
     const val SERVER_DETAIL = "server_detail/{serverId}"
     const val CHANNEL_DETAIL = "channel_detail/{channelId}"
+    const val CHAT = "server/{serverId}/channel/{channelId}/chat"
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
 
@@ -21,5 +22,9 @@ object NavRoutes {
 
     fun getChannelDetailRoute(channelId: String): String {
         return "channel_detail/$channelId"
+    }
+
+    fun getChatRoute(serverId: String, channelId: String): String {
+        return "server/$serverId/channel/$channelId/chat"
     }
 }

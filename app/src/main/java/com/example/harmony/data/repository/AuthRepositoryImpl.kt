@@ -6,6 +6,7 @@ import com.example.harmony.core.common.Resource
 import com.example.harmony.domain.model.User
 import com.example.harmony.domain.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -31,15 +32,23 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun register(username: String, email: String, password: String): Flow<Resource<User>> =
+    override fun register(displayName: String, email: String, password: String): Flow<Resource<User>> =
         flow {
             try {
                 emit(Resource.Loading<User>())
                 val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-                val userId = authResult.user?.uid ?: throw Exception(ERROR_SOMETHING_WENT_WRONG)
+                val firebaseUser = authResult.user ?: throw Exception(ERROR_SOMETHING_WENT_WRONG)
+                val userId = firebaseUser.uid
+
+                val profileUpdates = UserProfileChangeRequest.Builder()
+                    .setDisplayName(displayName)
+                    // .setPhotoUri(Uri.parse("your_photo_url")) // Optionally set photo URL here too
+                    .build()
+                firebaseUser.updateProfile(profileUpdates).await()
+
                 val user = User(
                     id = userId,
-                    username = username,
+                    displayName = displayName,
                     email = email
                 )
                 firestore.collection(USERS_COLLECTION).document(userId).set(user).await()
@@ -66,7 +75,7 @@ class AuthRepositoryImpl @Inject constructor(
         val firebaseUser = auth.currentUser ?: return null
         return User(
             id = firebaseUser.uid,
-            username = firebaseUser.displayName ?: "",
+            displayName = firebaseUser.displayName ?: "",
             email = firebaseUser.email ?: "",
             photoUrl = firebaseUser.photoUrl?.toString()
         )
