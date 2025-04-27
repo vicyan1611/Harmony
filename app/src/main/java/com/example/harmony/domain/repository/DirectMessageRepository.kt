@@ -1,5 +1,6 @@
 package com.example.harmony.domain.repository
 
+import android.net.Uri
 import com.example.harmony.core.common.Resource
 import com.example.harmony.domain.model.DirectMessageConversation
 import com.example.harmony.domain.model.Message
@@ -19,6 +20,7 @@ interface DirectMessageRepository {
     fun sendDirectMessage(
         conversationId: String,
         message: Message,
+        imageUri: Uri? = null,
         currentUserInfo: ParticipantInfo, // Pass current user info
         otherUserInfo: ParticipantInfo    // Pass other user info
     ): Flow<Resource<Unit>>

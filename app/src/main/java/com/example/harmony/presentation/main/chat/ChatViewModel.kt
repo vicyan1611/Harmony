@@ -8,6 +8,7 @@ import com.example.harmony.core.common.Resource
 import com.example.harmony.domain.model.Message
 import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.MessageRepository
+import com.example.harmony.domain.use_case.chat.SendChatMessageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
+    private val sendChatMessageUseCase: SendChatMessageUseCase,
     private val messageRepository: MessageRepository,
     private val authRepository: AuthRepository,
     private val savedStateHandle: SavedStateHandle
@@ -84,35 +86,60 @@ class ChatViewModel @Inject constructor(
             is ChatEvent.OnSendMessageClick -> {
                 sendMessage()
             }
+            is ChatEvent.OnPickImageClick -> {
+                // Handled in UI by launching picker
+            }
+            is ChatEvent.OnImageSelected -> {
+                _state.update { it.copy(selectedImageUri = event.uri) }
+            }
+            is ChatEvent.OnClearSelectedImage -> {
+                _state.update { it.copy(selectedImageUri = null) }
+            }
         }
     }
 
     private fun sendMessage() {
-        val currentUser = state.value.currentUser ?: return
-        Log.d("ChatViewModel", "currentUser.email ${currentUser.email}")
-        val text = state.value.currentMessageInput.trim()
-        if (text.isBlank()) return
+        val currentInput = state.value.currentMessageInput
+        val imageUri = state.value.selectedImageUri
+        val currentServerId = serverId ?: return
+        val currentChannelId = channelId ?: return
 
-        val message = Message(
-            channelId = channelId,
-            senderId = currentUser.id,
-            senderDisplayName = currentUser.displayName,
-            senderPhotoUrl = currentUser.photoUrl,
-            text = text
-        )
+        if (state.value.isSending || (currentInput.isBlank() && imageUri == null)) {
+            return
+        }
 
-        messageRepository.sendMessage(serverId, channelId, message).onEach { result ->
+        _state.update { it.copy(isSending = true, error = null) } // Set sending state
+
+
+        sendChatMessageUseCase(
+            serverId = currentServerId,
+            channelId = currentChannelId,
+            text = currentInput,
+            imageUri = imageUri
+        ).onEach { result ->
             when (result) {
                 is Resource.Loading -> {
-                    // Optionally show sending indicator
-                    _state.update { it.copy(currentMessageInput = "") }
                 }
                 is Resource.Success -> {
-
+                    _state.update {
+                        it.copy(
+                            isSending = false,
+                            currentMessageInput = "", // Clear input on success
+                            selectedImageUri = null // Clear image on success
+                        )
+                    }
                 }
                 is Resource.Error -> {
-                    _state.update { it.copy(error = "Failed to send: ${result.message}") }
-
+                    _state.update {
+                        it.copy(
+                            isSending = false,
+                            error = "Send Error: ${result.message}" // Show error
+                        )
+                    }
+                    viewModelScope.launch {
+                        kotlinx.coroutines.delay(3000)
+                        _state.update { it.copy(error = null) }
+                    }
                 }
             }
         }.launchIn(viewModelScope)
