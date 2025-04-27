@@ -7,6 +7,7 @@ import com.example.harmony.core.common.Constants
 import com.example.harmony.core.common.Resource
 import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.ChannelRepository
+import com.example.harmony.domain.repository.UserRepository
 import com.example.harmony.domain.use_case.LogoutUseCase
 // Import the new use case
 import com.example.harmony.domain.use_case.server.GetServersAndChannelsByUserIdUseCase
@@ -19,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val userRepository: UserRepository,
     private val logoutUseCase: LogoutUseCase,
     private val getServersAndChannelsByUserIdUseCase: GetServersAndChannelsByUserIdUseCase,
     private val channelRepository: ChannelRepository
@@ -109,8 +111,19 @@ class HomeViewModel @Inject constructor(
                 // Assuming getCurrentUser might fetch from Firestore and needs to be async
                 // For simplicity, using the potentially cached version. Adapt if fetch is needed.
                 val currentUser = authRepository.getCurrentUser() // Ensure this provides needed data or make it async
-                _state.update { it.copy(isUserLoading = false, user = currentUser) }
-
+                val collectionUser = userRepository.getCollectionUser(currentUser?.id ?: "").collect { res ->
+                    when (res) {
+                        is Resource.Loading -> {
+                            // Handle loading if needed
+                        }
+                        is Resource.Success -> {
+                            _state.update { it.copy(user = res.data) }
+                        }
+                        is Resource.Error -> {
+                            _state.update { it.copy(userLoadError = res.message ?: "Failed to load user data") }
+                        }
+                    }
+                }
             } catch (e: Exception) {
                 _state.update { it.copy(isUserLoading = false, userLoadError = "Failed to load user data") }
             }

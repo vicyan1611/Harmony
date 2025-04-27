@@ -1,6 +1,7 @@
 // harmony/presentation/main/home/components/ChannelList.kt
 package com.example.harmony.presentation.main.home.components
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,12 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.harmony.R
 import com.example.harmony.core.components.RoundedAvatar
+import com.example.harmony.core.components.RoundedButton
 import com.example.harmony.domain.model.Channel
 import com.example.harmony.domain.model.User
 
@@ -36,7 +39,8 @@ fun ChannelList(
     onChannelClick: (Channel) -> Unit,
     onAddChannelClick: () -> Unit, // TODO: Implement later
     onUserSettingsClick: () -> Unit, // TODO: Implement later
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isHost: Boolean = true
 ) {
     val listBgColor = MaterialTheme.colorScheme.surface // Slightly lighter than server list
     Column(
@@ -80,7 +84,8 @@ fun ChannelList(
                 ChannelCategoryHeader(
                     name = stringResource(R.string.channel_list_display_title_textchannel),
                     // Pass the lambda here
-                    onAddClick = onAddChannelClick
+                    onAddClick = onAddChannelClick,
+                    canAddChannel = isHost
                 )
             }
 
@@ -105,7 +110,8 @@ fun ChannelList(
 @Composable
 private fun ChannelCategoryHeader(
     name: String,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
+    canAddChannel: Boolean = true
 ) {
     Row(
         modifier = Modifier
@@ -120,12 +126,14 @@ private fun ChannelCategoryHeader(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        IconButton(onClick = onAddClick, modifier = Modifier.size(18.dp)) {
-            Icon (
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add Channel",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+        if (canAddChannel) {
+            IconButton(onClick = onAddClick, modifier = Modifier.size(18.dp)) {
+                Icon (
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Channel",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

@@ -48,7 +48,7 @@ fun AddChannelSheetContent(
             imeAction = ImeAction.Next,
             modifier = Modifier.fillMaxWidth(),
             isEditable = !isLoading,
-            showCharactersCount = true,
+            showCharactersCount = false,
             maxNChars = 50 // Max 50 chars
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -58,10 +58,10 @@ fun AddChannelSheetContent(
             onValueChange = onDescriptionChange,
             label = "Channel Description (Optional)",
             placeholder = "What is this channel about?",
-            maxLines = 4, // Allow multi-line
+            maxLines = 5, // Allow multi-line
             singleLine = false,
             imeAction = ImeAction.Done,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 80.dp), // Give description field some height
+            modifier = Modifier.fillMaxWidth().heightIn(min = 140.dp), // Give description field some height
             isEditable = !isLoading,
             showCharactersCount = true,
             maxNChars = 200 // Max 200 chars

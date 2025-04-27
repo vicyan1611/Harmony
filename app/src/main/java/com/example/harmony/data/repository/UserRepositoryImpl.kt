@@ -3,6 +3,7 @@ package com.example.harmony.data.repository
 import android.net.Uri
 import com.example.harmony.core.common.Constants
 import com.example.harmony.core.common.Resource
+import com.example.harmony.domain.model.User
 import com.example.harmony.domain.repository.UserRepository
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
@@ -69,6 +70,31 @@ class UserRepositoryImpl @Inject constructor (
             emit(Resource.Success(Unit)) // Indicate success
         } catch (e: Exception) {
             // Handle potential exceptions (e.g., network error, permissions issue, document not found)
+            emit(Resource.Error(e.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
+        }
+    }.catch { exception ->
+        // Catch exceptions specific to the flow itself
+        emit(Resource.Error(exception.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
+    }
+
+    override fun getCollectionUser(userId: String): Flow<Resource<User>> = flow {
+        emit(Resource.Loading())
+        try {
+            val documentSnapshot = firestore.collection(Constants.USERS_COLLECTION)
+                .document(userId)
+                .get()
+                .await()
+            if (documentSnapshot.exists()) {
+                val user = documentSnapshot.toObject(User::class.java)
+                if (user != null) {
+                    emit(Resource.Success(user))
+                } else {
+                    emit(Resource.Error("User data is null."))
+                }
+            } else {
+                emit(Resource.Error("User document not found."))
+            }
+        } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
         }
     }.catch { exception ->
