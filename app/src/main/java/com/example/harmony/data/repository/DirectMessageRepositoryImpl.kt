@@ -1,5 +1,6 @@
 package com.example.harmony.data.repository
 
+import android.net.Uri
 import com.example.harmony.core.common.Constants.DIRECT_MESSAGES_COLLECTION
 import com.example.harmony.core.common.Constants.ERROR_SOMETHING_WENT_WRONG
 import com.example.harmony.core.common.Constants.MESSAGES_COLLECTION
@@ -7,6 +8,7 @@ import com.example.harmony.core.common.Resource
 import com.example.harmony.domain.model.DirectMessageConversation
 import com.example.harmony.domain.model.Message
 import com.example.harmony.domain.model.ParticipantInfo
+import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.DirectMessageRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -14,13 +16,19 @@ import kotlinx.coroutines.channels.awaitClose
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 import javax.inject.Inject
 
-class DirectMessageRepositoryImpl @Inject constructor(private val firestore: FirebaseFirestore) : DirectMessageRepository {
+class DirectMessageRepositoryImpl @Inject constructor(
+    private val firestore: FirebaseFirestore,
+    private val storage: FirebaseStorage,
+    private val authRepository: AuthRepository
+) : DirectMessageRepository {
 
     private fun getConversationId(userId1: String, userId2: String): String {
         return if (userId1 < userId2) "${userId1}_${userId2}" else "${userId2}_${userId1}"
@@ -142,7 +150,12 @@ class DirectMessageRepositoryImpl @Inject constructor(private val firestore: Fir
             }
             if (snapshots != null) {
                 val messages = snapshots.documents.mapNotNull { doc ->
-                    doc.toObject(Message::class.java)?.copy(id = doc.id)
+                    try {
+                        doc.toObject(Message::class.java)?.copy(id = doc.id)
+                    } catch (e: Exception) {
+                        println("Error parsing DM document ${doc.id}: ${e.message}")
+                        null
+                    }
                 }
                 trySend(Resource.Success(messages))
             } else {
@@ -156,31 +169,62 @@ class DirectMessageRepositoryImpl @Inject constructor(private val firestore: Fir
     override fun sendDirectMessage(
         conversationId: String,
         message: Message,
+        imageUri: Uri?,
         currentUserInfo: ParticipantInfo,
         otherUserInfo: ParticipantInfo
     ): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
+
+        val currentUser = authRepository.getCurrentUser() // Get current user for ID
+        if (currentUser == null) {
+            emit(Resource.Error("User not authenticated"))
+            return@flow
+        }
+
         try {
+
+            var finalImageUrl: String? = null
+
+            if (imageUri != null) {
+                val imageId = UUID.randomUUID().toString()
+                // Use a path specific to DMs or reuse the chat_images path
+                val imagePath = "dm_images/${currentUser.id}/$imageId.jpg"
+                val storageRef = storage.reference.child(imagePath)
+
+                storageRef.putFile(imageUri).await()
+                finalImageUrl = storageRef.downloadUrl.await()?.toString()
+
+                if (finalImageUrl == null) {
+                    emit(Resource.Error("Failed to get image download URL"))
+                    return@flow
+                }
+            }
+
+
             val conversationRef = firestore.collection(DIRECT_MESSAGES_COLLECTION).document(conversationId)
             val newMessageRef = conversationRef.collection(MESSAGES_COLLECTION).document()
 
-            val messageData = mapOf(
+            val messageData = mutableMapOf<String, Any?>(
                 "senderId" to message.senderId,
                 "senderDisplayName" to message.senderDisplayName,
                 "senderPhotoUrl" to message.senderPhotoUrl,
-                "text" to message.text,
+                "text" to message.text, // Will be empty if imageUri was not null in UseCase
                 "timestamp" to FieldValue.serverTimestamp()
             )
-
+            if (finalImageUrl != null) {
+                messageData["imageUrl"] = finalImageUrl
+            } else if (message.text.isBlank()) {
+                emit(Resource.Error("Cannot send empty message"))
+                return@flow
+            }
             newMessageRef.set(messageData).await()
 
+            val lastMessageDisplay = if (finalImageUrl != null) "[Image]" else message.text
             val conversationUpdateData = mapOf(
-                "lastMessageText" to message.text,
+                "lastMessageText" to lastMessageDisplay,
                 "lastMessageSenderId" to message.senderId,
                 "lastActivity" to FieldValue.serverTimestamp()
-
             )
-
             conversationRef.set(conversationUpdateData, SetOptions.merge()).await()
 
             emit(Resource.Success(Unit))

@@ -1,5 +1,6 @@
 package com.example.harmony.presentation.main.dm
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,8 @@ import com.example.harmony.domain.model.ParticipantInfo
 import com.example.harmony.domain.model.User
 import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.DirectMessageRepository
+import com.example.harmony.domain.use_case.chat.SendChatMessageUseCase
+import com.example.harmony.presentation.main.chat.ChatEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,16 +30,22 @@ data class DirectMessageChatState(
     val conversationId: String = "",
     val otherParticipantName: String = "Direct Message",
     val otherParticipantPhotoUrl: String? = null,
-    val currentUser: User? = null
+    val currentUser: User? = null,
+    val selectedImageUri: Uri? = null,
+    val isSending: Boolean = false
 )
 
 sealed class DirectMessageChatEvent {
     data class OnMessageInputChange(val input: String) : DirectMessageChatEvent()
     object OnSendMessageClick : DirectMessageChatEvent()
+    object OnPickImageClick : DirectMessageChatEvent()
+    data class OnImageSelected(val uri: Uri?) : DirectMessageChatEvent()
+    object OnClearSelectedImage : DirectMessageChatEvent()
 }
 
 @HiltViewModel
 class DirectMessageChatViewModel @Inject constructor(
+    private val sendChatMessageUseCase: SendChatMessageUseCase,
     private val dmRepository: DirectMessageRepository,
     private val authRepository: AuthRepository,
     savedStateHandle: SavedStateHandle
@@ -75,6 +84,15 @@ class DirectMessageChatViewModel @Inject constructor(
             }
             is DirectMessageChatEvent.OnSendMessageClick -> {
                 sendMessage()
+            }
+            is DirectMessageChatEvent.OnPickImageClick -> {
+
+            }
+            is DirectMessageChatEvent.OnImageSelected -> {
+                _state.update { it.copy(selectedImageUri = event.uri) }
+            }
+            is DirectMessageChatEvent.OnClearSelectedImage -> {
+                _state.update { it.copy(selectedImageUri = null) }
             }
         }
     }
@@ -127,38 +145,54 @@ class DirectMessageChatViewModel @Inject constructor(
     }
 
     private fun sendMessage() {
-        val currentUser = state.value.currentUser ?: return
+        val imageUri = state.value.selectedImageUri
         val text = state.value.currentMessageInput.trim()
-        if (text.isBlank()) return
+        if ((text.isBlank() && imageUri == null) || state.value.isSending) return
 
         // Ensure participant details are loaded before sending
-        val otherParticipantName = state.value.otherParticipantName
-        if (otherParticipantName == "Direct Message" || otherParticipantName == "Unknown User") {
-            _state.update { it.copy(error = "Cannot send message: Participant details not loaded.") }
+        val otherInfo = state.value.otherParticipantName.let { name ->
+            if (name != "Direct Message" && name != "Unknown User") {
+                ParticipantInfo(name, state.value.otherParticipantPhotoUrl)
+            } else null // Ensure participant details are loaded
+        }
+
+        if (otherInfo == null) {
+            _state.update { it.copy(isSending = false, error = "Cannot send: Participant details not loaded.") }
+            // Optionally try reloading details here
             return
         }
 
-        val message = Message(
-            senderId = currentUser.id,
-            senderDisplayName = currentUser.displayName,
-            senderPhotoUrl = currentUser.photoUrl,
-            text = text
-        )
+        _state.update { it.copy(isSending = true, error = null) }
 
-        val currentUserInfo = ParticipantInfo(currentUser.displayName, currentUser.photoUrl)
-        // Use the loaded details from the state
-        val otherUserInfo = ParticipantInfo(state.value.otherParticipantName, state.value.otherParticipantPhotoUrl)
-
-        dmRepository.sendDirectMessage(conversationId, message, currentUserInfo, otherUserInfo).onEach { result ->
+        sendChatMessageUseCase(
+            conversationId = conversationId,
+            text = text,
+            imageUri = imageUri,
+            otherUserInfo = otherInfo
+        ).onEach { result ->
             when (result) {
                 is Resource.Loading -> {
-                    _state.update { it.copy(currentMessageInput = "") }
                 }
                 is Resource.Success -> {
-                    // Message sent successfully
+                    _state.update {
+                        it.copy(
+                            isSending = false,
+                            currentMessageInput = "", // Clear input on success
+                            selectedImageUri = null // Clear image on success
+                        )
+                    }
                 }
                 is Resource.Error -> {
-                    _state.update { it.copy(error = "Failed to send: ${result.message}") }
+                    _state.update {
+                        it.copy(
+                            isSending = false,
+                            error = "Send Error: ${result.message}" // Show error
+                        )
+                    }
+                    viewModelScope.launch {
+                        kotlinx.coroutines.delay(3000)
+                        _state.update { it.copy(error = null) }
+                    }
                 }
             }
         }.launchIn(viewModelScope)
