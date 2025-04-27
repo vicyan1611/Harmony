@@ -1,5 +1,6 @@
 package com.example.harmony.presentation.navigation
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -79,6 +80,10 @@ fun NavGraph(
             CreateServerScreen (
                 mainNavController = navController
             )
+        }
+
+        composable(route = NavRoutes.SETTINGS) {
+            Text("Settings Screen")
         }
 
 //        Channel chat
