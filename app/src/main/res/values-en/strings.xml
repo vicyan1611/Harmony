@@ -15,7 +15,7 @@
     <string name="view_profile_bio_title">Bio</string>
     <string name="server_creation_servername_title">Create Your Server</string>
     <string name="server_creation_servername_description">Create your own server and start chatting</string>
-    <string name="server_creation_invite_doneButton">Skip</string>
+    <string name="server_creation_invite_doneButton">Done</string>
     <string name="server_creation_invite_title">Invite someone</string>
     <string name="server_creation_invite_description">Invite friends to join you</string>
     <string name="server_creation_invite_sharelinkButton">Share Link</string>
@@ -52,4 +52,9 @@
     <string name="profile_information_title">Profile Information</string>
     <string name="app_settings_title">App Settings</string>
     <string name="error_user_not_logged_in">User not logged in. Please log in to continue.</string>
+    <string name="add_channel_sheet_create_button">Create Channel</string>
+    <string name="channel_list_display_title_textchannel">Text Channels</string>
+    <string name="add_channel_sheet_title">Create Channel</string>
+    <string name="add_channel_sheet_name_label">Channel Name</string>
+    <string name="add_channel_sheet_description_label">Channel Description (Optional)</string>
 </resources>

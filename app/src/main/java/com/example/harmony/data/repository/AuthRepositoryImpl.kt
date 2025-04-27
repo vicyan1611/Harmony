@@ -39,7 +39,7 @@ class AuthRepositoryImpl @Inject constructor(
                 val userId = authResult.user?.uid ?: throw Exception(ERROR_SOMETHING_WENT_WRONG)
                 val user = User(
                     id = userId,
-                    displayName = username,
+                    username = username,
                     email = email
                 )
                 firestore.collection(USERS_COLLECTION).document(userId).set(user).await()
@@ -66,7 +66,7 @@ class AuthRepositoryImpl @Inject constructor(
         val firebaseUser = auth.currentUser ?: return null
         return User(
             id = firebaseUser.uid,
-            displayName = firebaseUser.displayName ?: "",
+            username = firebaseUser.displayName ?: "",
             email = firebaseUser.email ?: "",
             photoUrl = firebaseUser.photoUrl?.toString()
         )

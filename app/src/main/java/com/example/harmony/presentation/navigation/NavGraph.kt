@@ -1,17 +1,24 @@
 package com.example.harmony.presentation.navigation
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.harmony.domain.model.AppLanguage
+import androidx.navigation.navArgument
 import com.example.harmony.presentation.auth.login.LoginScreen
 import com.example.harmony.presentation.auth.register.RegisterScreen
 import com.example.harmony.presentation.auth.splash.SplashScreen
+import com.example.harmony.presentation.main.chat.ChatScreen
+import com.example.harmony.presentation.main.config_server.ConfigServerScreen
+import com.example.harmony.presentation.main.create_server.CreateServerScreen
+import com.example.harmony.presentation.main.dm.DirectMessageChatScreen
+import com.example.harmony.presentation.main.dm.DirectMessageListScreen
 import com.example.harmony.presentation.main.home.HomeScreen
-import com.example.harmony.presentation.main.profile.MyProfileScreen
-import com.example.harmony.presentation.main.profile.edit.EditProfileScreen
+import com.example.harmony.presentation.main.join_server.JoinServerScreen
+import com.example.harmony.presentation.main.search.UserSearchScreen
 
 @Composable
 fun NavGraph(
@@ -44,42 +51,11 @@ fun NavGraph(
                     navController.navigate(NavRoutes.REGISTER)
                 },
                 onNavigateToHome = {
-//                    navController.navigate(NavRoutes.HOME) {
-//                        popUpTo(NavRoutes.LOGIN) { inclusive = true }
-//                    }
-                    navController.navigate(NavRoutes.MY_PROFILE) {
+                    navController.navigate(NavRoutes.HOME) {
                         popUpTo(NavRoutes.LOGIN) { inclusive = true }
-                        launchSingleTop = true
                     }
                 }
             )
-        }
-
-        composable(route = NavRoutes.MY_PROFILE) {
-            MyProfileScreen(
-                onNavigateToEditProfile = { navController.navigate(NavRoutes.EDIT_PROFILE) },
-                onNavigateToLogin = {
-                    navController.navigate(NavRoutes.LOGIN) {
-                        // Clear backstack up to home or splash depending on flow
-                        popUpTo(NavRoutes.HOME) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
-            )
-        }
-
-        // Composable for editing profile
-        composable(route = NavRoutes.EDIT_PROFILE) {
-            EditProfileScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        // Existing ProfileScreen (might be used for settings now)
-        composable(route = NavRoutes.PROFILE) {
-            // Decide how/if you still use this screen.
-            // Maybe rename route to SETTINGS?
-            // ProfileScreen(navController = navController)
         }
 
         composable(route = NavRoutes.REGISTER) {
@@ -97,23 +73,91 @@ fun NavGraph(
             )
         }
 
+//        Config Server
+        composable(
+            route = NavRoutes.CONFIG_SERVER, // Use the route pattern with placeholder
+            arguments = listOf(navArgument("serverId") { type = NavType.StringType }) // Define the argument
+        ) { backStackEntry ->
+            // The NavController and ViewModel handle the argument extraction internally
+            // via SavedStateHandle when using hiltViewModel()
+            ConfigServerScreen(
+                navController = navController
+                // ViewModel will be injected by Hilt and get the serverId from SavedStateHandle
+            )
+        }
+
 //         Main Screens
         composable(route = NavRoutes.HOME) {
             HomeScreen(
-//                onNavigateToServerDetail = { serverId ->
-//                    navController.navigate(NavRoutes.getServerDetailRoute(serverId))
-//                },
-//                onNavigateToProfile = {
-//                    navController.navigate(NavRoutes.PROFILE)
-//                }
-                onNavigateToLogin = {
-                    navController.navigate(NavRoutes.LOGIN) {
-                        popUpTo(NavRoutes.HOME) {inclusive = true}
-                        launchSingleTop = true
+                navController = navController,
+                onNavigateToJoinServer = {
+                    navController.navigate(NavRoutes.JOIN_SERVER)
+                }
+            )
+        }
+
+//        Create server
+        composable(route = NavRoutes.CREATE_SERVER) {
+            CreateServerScreen (
+                mainNavController = navController
+            )
+        }
+
+        composable(route = NavRoutes.SETTINGS) {
+            Text("Settings Screen")
+        }
+
+        composable(route = NavRoutes.JOIN_SERVER) {
+            JoinServerScreen(
+                navController = navController,
+                onJoinSuccess = {
+                    navController.navigate(NavRoutes.HOME) {
+                        popUpTo(NavRoutes.JOIN_SERVER) { inclusive = true }
                     }
                 }
             )
         }
+
+//        Channel chat
+        composable(
+            route = NavRoutes.CHAT, arguments = listOf(
+                navArgument("serverId") { type = NavType.StringType },
+                navArgument("channelId") { type = NavType.StringType }
+            )
+        ) {
+            ChatScreen()
+        }
+
+        composable(route = NavRoutes.DM_LIST) {
+            DirectMessageListScreen(
+                onNavigateToDmChat = { conversationId ->
+                    navController.navigate(NavRoutes.getDmChatRoute(conversationId))
+                },
+                onNavigateToUserSearch = {
+                    navController.navigate(NavRoutes.USER_SEARCH)
+                }
+            )
+        }
+
+        composable(
+            route = NavRoutes.DM_CHAT,
+            arguments = listOf(navArgument("conversationId") { type = NavType.StringType })
+        ) {
+            DirectMessageChatScreen() // ViewModel gets args via SavedStateHandle
+        }
+
+        composable(route = NavRoutes.USER_SEARCH) {
+            UserSearchScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToDmChat = { conversationId ->
+                    // Navigate to DM chat, potentially clearing search from backstack
+                    navController.navigate(NavRoutes.getDmChatRoute(conversationId)) {
+                        popUpTo(NavRoutes.USER_SEARCH) { inclusive = true }
+                    }
+                }
+            )
+        }
+
 //
 //        composable(
 //            route = NavRoutes.SERVER_DETAIL,

@@ -21,7 +21,7 @@ fun RoundedAvatar(modifier: Modifier = Modifier, size: Dp = 80.dp, avatarImageUr
             Text(
                 text = char.toString(),
                 style = TextStyle(
-                    color = MaterialTheme.colorScheme.onSecondary,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 24.sp
                 )
             )
@@ -40,6 +40,6 @@ fun RoundedAvatar(modifier: Modifier = Modifier, size: Dp = 80.dp, avatarImageUr
 @Composable
 fun RoundedAvatarPreview() {
     HarmonyTheme {
-        RoundedAvatar(avatarImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s", char = 'S')
+        RoundedAvatar(char = 'G') // avatarImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s"
     }
 }

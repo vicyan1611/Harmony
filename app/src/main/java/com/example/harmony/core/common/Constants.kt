@@ -7,6 +7,12 @@ object Constants {
     const val SERVERS_COLLECTION = "servers"
     const val CHANNELS_COLLECTION = "channels"
     const val MESSAGES_COLLECTION = "messages"
+    const val DIRECT_MESSAGES_COLLECTION = "direct_messages"
+
+    //
+
+    // Invite to a server
+    const val INVITE_BASE_URL = "https://example.com"
 
     // Error Messages
     const val ERROR_SOMETHING_WENT_WRONG = "Something went wrong"

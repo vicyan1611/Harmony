@@ -3,14 +3,12 @@ package com.example.harmony.presentation.main.create_server
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.activity.ComponentActivity
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,25 +18,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,6 +54,9 @@ import coil3.request.ImageRequest
 import com.example.harmony.R
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.harmony.core.components.HarmonyButton
+import com.example.harmony.core.components.HarmonyTextField
 
 sealed class ServerCreationScreen(val route: String, val label: String) {
     object ServerName: ServerCreationScreen("server/creation/name", "Name")
@@ -78,86 +75,36 @@ fun ShareTextToOtherApps(textToShare: String, context: Context) {
 }
 
 @Composable
-fun TextBox(modifier: Modifier = Modifier, minLines: Int = 1, maxLines: Int = 1, editable: Boolean = false, text: String = "", textStyle: TextStyle = LocalTextStyle.current, onValueChange: (String) -> Unit = {}, label: String = "", showCharsCounter: Boolean = false, maxChars: Int = Int.MAX_VALUE,
-            colors: TextFieldColors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                disabledContainerColor = MaterialTheme.colorScheme.tertiary,
-                focusedTextColor = MaterialTheme.colorScheme.onTertiary,
-                unfocusedTextColor = MaterialTheme.colorScheme.onTertiary,
-                disabledTextColor = MaterialTheme.colorScheme.onTertiary,
-                focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onTertiary,
-                disabledLabelColor = MaterialTheme.colorScheme.onTertiary,
-                cursorColor = MaterialTheme.colorScheme.onTertiary,
-                focusedIndicatorColor = MaterialTheme.colorScheme.onSecondary
-            )) {
-    Box(modifier = modifier) {
-        OutlinedTextField(
-            value = text,
-            onValueChange = onValueChange,
-            modifier = modifier,
-            readOnly = !editable,
-            textStyle = textStyle,
-            singleLine = (maxLines == 1),
-            minLines = minLines,
-            maxLines = maxLines,
-            label = {
-                Text(
-                    text = label
-                )
-            },
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                disabledContainerColor = MaterialTheme.colorScheme.tertiary,
-                focusedTextColor = MaterialTheme.colorScheme.onTertiary,
-                unfocusedTextColor = MaterialTheme.colorScheme.onTertiary,
-                disabledTextColor = MaterialTheme.colorScheme.onTertiary,
-                focusedLabelColor = MaterialTheme.colorScheme.onTertiary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onTertiary,
-                disabledLabelColor = MaterialTheme.colorScheme.onTertiary,
-                cursorColor = MaterialTheme.colorScheme.onTertiary,
-                focusedIndicatorColor = MaterialTheme.colorScheme.onSecondary
-            ),
-            shape = RoundedCornerShape(16.dp)
-        )
-        if (showCharsCounter && maxChars < Int.MAX_VALUE) {
-            Text(
-                text = "${maxChars - text.length}",
-                style = TextStyle(
-                    fontSize = 12.sp
-                ),
-                modifier = Modifier
-                    .padding(end = 8.dp, bottom = 8.dp)
-                    .align(Alignment.BottomEnd)
-            )
-        }
-
-    }
-}
-
-@Composable
-fun ServerCreationNav(navController: NavHostController) {
+fun ServerCreationNav(
+    navController: NavHostController,
+    viewModel: CreateServerViewModel // Added parameter
+) {
     NavHost(
         navController = navController,
         startDestination = ServerCreationScreen.ServerName.route,
         modifier = Modifier.fillMaxWidth()
     ) {
         composable(ServerCreationScreen.ServerName.route) {
-            ServerCreationName(navController)
+            // Pass ViewModel down
+            ServerCreationName(navController = navController, viewModel = viewModel)
         }
         composable(ServerCreationScreen.ServerInvite.route) {
-            ServerCreationInvite(navController)
+            // Pass ViewModel down
+            ServerCreationInvite(nestedNavController = navController, viewModel = viewModel)
         }
     }
 }
 
 @Composable
-fun ServerCreationInvite(navController: NavHostController, url: String = "http://hahahaha.com") {
+fun ServerCreationInvite(nestedNavController: NavHostController, viewModel: CreateServerViewModel) {
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
-    val activity = context as? ComponentActivity
+    val state = viewModel.uiState.collectAsState()
+
+    if (state.value.createdServerInviteLink == null) return
+
+    val url = state.value.createdServerInviteLink!!
+
     Column (
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -168,13 +115,13 @@ fun ServerCreationInvite(navController: NavHostController, url: String = "http:/
         ) {
             Button(
                 onClick = {
-                    activity?.finish()
+                    viewModel.onEvent(CreateServerEvent.InviteDismissed)
                 },
                 colors = ButtonColors(
                     containerColor = Color.Transparent,
-                    contentColor = Color.White,
+                    contentColor = MaterialTheme.colorScheme.onBackground,
                     disabledContainerColor = Color.Transparent,
-                    disabledContentColor = Color.White
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 contentPadding = PaddingValues(0.dp)
             ) {
@@ -208,8 +155,7 @@ fun ServerCreationInvite(navController: NavHostController, url: String = "http:/
             text = stringResource(R.string.server_creation_invite_description),
             style = TextStyle(
                 fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-                color = Color.LightGray
+                textAlign = TextAlign.Center
             ),
             overflow = TextOverflow.Visible
         )
@@ -220,63 +166,53 @@ fun ServerCreationInvite(navController: NavHostController, url: String = "http:/
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable {
-                    clipboardManager.setText(AnnotatedString(url))
-                }
                 .padding(vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
-            TextBox(
-                text = url,
+            HarmonyTextField(
+                value = url,
+                label = "Invite Link",
+                onValueChange = {},
                 maxLines = 1,
-                textStyle = TextStyle(
-                    color = Color.LightGray
-                ),
-                editable = false,
+                isEditable = false,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f) // occupy remaining space
-                    .padding(end = 8.dp)
+                    .padding(end = 8.dp),
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            clipboardManager.setText(AnnotatedString(url))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ContentCopy,
+                            contentDescription = "",
+                            modifier = Modifier.padding(4.dp)
+                        )
+                    }
+                }
             )
-            Icon(
-                imageVector = Icons.Filled.ContentCopy,
-                contentDescription = "",
-                modifier = Modifier.padding(4.dp)
-            )
+
         }
 
         Spacer(modifier = Modifier.height(6.dp))
         // share link to other apps
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
+        HarmonyButton(
+            text = stringResource(R.string.server_creation_invite_sharelinkButton),
             onClick = {
                 ShareTextToOtherApps(
                     textToShare = url,
                     context = context
                 )
-            },
-            contentPadding = PaddingValues(12.dp),
-            colors = ButtonColors(
-                containerColor = Color(0xFF4F1FCC),
-                contentColor = Color.White,
-                disabledContainerColor = Color.DarkGray,
-                disabledContentColor = Color.White
-            )
-        ) {
-            Text(
-                text = stringResource(R.string.server_creation_invite_sharelinkButton),
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        }
+            }
+        )
     }
 }
 
 @Composable
-fun ImagePickerFromGallery(setSelectedImageUri: (Uri?) -> Unit, selectedImageUri: Uri?) {
+fun ImagePickerFromGallery(selectedImageUri: Uri?, setSelectedImageUri: (Uri?) -> Unit) {
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -298,7 +234,7 @@ fun ImagePickerFromGallery(setSelectedImageUri: (Uri?) -> Unit, selectedImageUri
             shape = CircleShape,
             border = BorderStroke(
                 width = 1.dp,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
             ),
             modifier = Modifier.size(80.dp),
             contentPadding = PaddingValues(0.dp)
@@ -325,9 +261,18 @@ fun ImagePickerFromGallery(setSelectedImageUri: (Uri?) -> Unit, selectedImageUri
 }
 
 @Composable
-fun ServerCreationName(navController: NavHostController) {
-    var serverName by remember { mutableStateOf("") }
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+fun ServerCreationName(navController: NavHostController, viewModel: CreateServerViewModel) {
+    val state = viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    if (state.value.errorMessage != null) {
+        Toast.makeText(
+            context,
+            state.value.errorMessage,
+            Toast.LENGTH_LONG
+        ).show()
+    }
+
     // header
     Column (
         modifier = Modifier.fillMaxWidth()
@@ -352,7 +297,7 @@ fun ServerCreationName(navController: NavHostController) {
             style = TextStyle(
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
-                color = Color.LightGray
+                color = MaterialTheme.colorScheme.onBackground
             ),
             overflow = TextOverflow.Visible
         )
@@ -360,54 +305,81 @@ fun ServerCreationName(navController: NavHostController) {
         // server image
         ImagePickerFromGallery(
             setSelectedImageUri = { uri ->
-                selectedImageUri = uri
+                viewModel.onEvent(CreateServerEvent.ImageSelected(uri))
             },
-            selectedImageUri = selectedImageUri
+            selectedImageUri = state.value.selectedImageUri,
         )
 
         // server name
-        TextBox(
-            text = serverName,
+        HarmonyTextField(
+            value = state.value.serverName,
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1,
-            editable = true,
+            isEditable = !state.value.isLoading,
             onValueChange = { newText ->
-                serverName = newText
+                viewModel.onEvent(CreateServerEvent.NameChanged(newText))
             },
-            label = stringResource(R.string.server_creation_servername_label)
+            label = stringResource(R.string.server_creation_servername_label),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // create button
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
+        // create
+        HarmonyButton(
+            text = stringResource(R.string.server_creation_createbutton),
             onClick = {
-                navController.navigate(ServerCreationScreen.ServerInvite.route)
+//                navController.navigate(ServerCreationScreen.ServerInvite.route)
+                viewModel.onEvent(CreateServerEvent.CreateServerClicked)
             },
-            contentPadding = PaddingValues(12.dp),
-            colors = ButtonColors(
-                containerColor = Color(0xFF4F1FCC),
-                contentColor = Color.White,
-                disabledContainerColor = Color.DarkGray,
-                disabledContentColor = Color.White
-            )
-        ) {
-            Text(
-                text = stringResource(R.string.server_creation_createbutton),
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        }
+            isLoading = state.value.isLoading
+        )
     }
 }
 
 @Composable
-fun ServerCreation(navController: NavHostController = rememberNavController()) {
-    ServerCreationNav(
-        navController = navController
-    )
+fun CreateServerScreen(
+    mainNavController: NavHostController // Passed from the main NavGraph call
+) {
+    val viewModel: CreateServerViewModel = hiltViewModel()
+    // This NavController is for the nested navigation (Name <-> Invite)
+    val nestedNavController = rememberNavController()
+
+    LaunchedEffect(key1 = viewModel.navigationEvent) {
+        viewModel.navigationEvent.collect { command ->
+            when (command) {
+                is NavigationCommand.NavigateTo -> {
+                    // Use the nested controller for navigation *within* this flow
+                    nestedNavController.navigate(command.route)
+                }
+                is NavigationCommand.NavigateBack -> {
+                    // Use the main controller to exit the *entire* ServerCreation flow
+                    mainNavController.popBackStack()
+                }
+
+                is NavigationCommand.NavigateBackWithResult -> {
+                    // Set the result on the *previous* back stack entry (HomeScreen's entry)
+                    mainNavController.previousBackStackEntry?.savedStateHandle?.set(
+                        command.result.first, // key: "server_created"
+                        command.result.second // value: true
+                    )
+                    mainNavController.popBackStack()
+                }
+            }
+        }
+    }
+
+    // Pass the nested NavController to the NavHost managing Name/Invite screens
+    Column (
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        ServerCreationNav(
+            navController = nestedNavController,
+            viewModel = viewModel // Pass the viewModel down
+        )
+    }
 }

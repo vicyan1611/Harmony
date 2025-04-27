@@ -19,6 +19,13 @@
     <string name="server_creation_invite_title">Mời ai đó</string>
     <string name="server_creation_invite_description">Mời bạn bè tham gia cùng bạn</string>
     <string name="server_creation_invite_sharelinkButton">Chia sẻ liên kết</string>
+    <string name="view_profile_bio_title">Giới thiệu</string>
+    <string name="server_creation_servername_title">Tạo Máy Chủ Của Bạn</string>
+    <string name="server_creation_servername_description">Tạo máy chủ của riêng bạn và bắt đầu trò chuyện</string>
+    <string name="server_creation_invite_doneButton">Xong</string>
+    <string name="server_creation_invite_title">Thêm một vài người</string>
+    <string name="server_creation_invite_description">Hãy mời một vài người bạn</string>
+    <string name="server_creation_invite_sharelinkButton">Chia sẻ link</string>
     <string name="server_creation_servername_label">Tên máy chủ</string>
     <string name="server_creation_createbutton">Tạo máy chủ</string>
 
@@ -53,4 +60,9 @@
     <string name="profile_information_title">Thông Tin Hồ Sơ</string>
     <string name="app_settings_title">Cài Đặt Ứng Dụng</string>
     <string name="error_user_not_logged_in">Người dùng chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.</string>
+    <string name="add_channel_sheet_create_button">Tạo kênh</string>
+    <string name="channel_list_display_title_textchannel">Kênh văn bản</string>
+    <string name="add_channel_sheet_title">Tạo kênh</string>
+    <string name="add_channel_sheet_name_label">Tên kênh</string>
+    <string name="add_channel_sheet_description_label">Mô tả kênh</string>
 </resources>

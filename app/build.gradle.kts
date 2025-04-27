@@ -95,8 +95,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    // Preferences DataStore
-    implementation("androidx.datastore:datastore-preferences:1.1.1") // Check for the latest version
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.runtime.livedata)
 }
 
 //kapt {

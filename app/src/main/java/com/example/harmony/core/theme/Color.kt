@@ -3,6 +3,7 @@ package com.example.harmony.core.theme
 import androidx.compose.ui.graphics.Color
 
 object Color {
+
     // Light Theme Colors
     val Primary = Color(0xFF6200EE)
     val PrimaryVariant = Color(0xFF3700B3)

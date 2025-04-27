@@ -8,6 +8,8 @@ data class User(
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val settings: UserSettings? = UserSettings()
+    val updatedAt: Long = System.currentTimeMillis(),
+    val bio: String = ""
 )
 {
     constructor() : this("", "", "", null, 0L, 0L, UserSettings())
