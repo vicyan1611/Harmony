@@ -13,4 +13,8 @@ sealed class HomeEvent {
     data class OnNewChannelNameChange(val name: String) : HomeEvent()
     data class OnNewChannelDescriptionChange(val description: String) : HomeEvent()
     object OnCreateChannelClicked : HomeEvent()
+
+    object OnShowMyProfileSheet : HomeEvent()
+    object OnDismissMyProfileSheet : HomeEvent()
+    object OnNavigateToSettings : HomeEvent()
 }

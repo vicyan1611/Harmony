@@ -40,7 +40,8 @@ fun ChannelList(
     onAddChannelClick: () -> Unit, // TODO: Implement later
     onUserSettingsClick: () -> Unit, // TODO: Implement later
     modifier: Modifier = Modifier,
-    isHost: Boolean = true
+    isHost: Boolean = true,
+    onAvatarClick: () -> Unit
 ) {
     val listBgColor = MaterialTheme.colorScheme.surface // Slightly lighter than server list
     Column(
@@ -102,7 +103,8 @@ fun ChannelList(
         // User Panel at the Bottom
         UserPanel(
             user = currentUser,
-            onSettingsClick = onUserSettingsClick
+            onSettingsClick = onUserSettingsClick,
+            onAvatarClick = onAvatarClick
         )
     }
 }
@@ -182,7 +184,8 @@ private fun ChannelItem(
 fun UserPanel(
     user: User?,
     onSettingsClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAvatarClick: () -> Unit
 ) {
     Row(
         modifier = modifier
@@ -193,7 +196,10 @@ fun UserPanel(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f).padding(end = 8.dp).clickable { onAvatarClick() }
+        ) {
             // User Avatar
             RoundedAvatar( // Use your RoundedAvatar
                 size = 32.dp,

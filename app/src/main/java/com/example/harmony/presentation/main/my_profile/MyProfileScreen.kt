@@ -12,7 +12,9 @@ import com.example.harmony.core.components.RoundedButton
 import com.example.harmony.core.components.UserProfileLayout
 
 @Composable
-fun MyProfile(displayedName: String = "", username: String = "", bio: String = "", avatarUrl: String = "", modifier: Modifier, onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit = {}, bodyContent: @Composable RowScope.() -> Unit = {}) {
+fun MyProfile(displayedName: String = "", username: String = "", bio: String = "", avatarUrl: String = "", modifier: Modifier, onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit = {}, bodyContent: @Composable RowScope.() -> Unit = {},
+              onSettingsClick: () -> Unit = {}, hasSettings: Boolean = true
+) {
     UserProfileLayout(
         displayedName = displayedName,
         username = username,
@@ -21,18 +23,23 @@ fun MyProfile(displayedName: String = "", username: String = "", bio: String = "
         onDismissRequest = onDismissRequest,
         avatarUrl = avatarUrl,
         headerContent = {
-            bodyContent()
-            RoundedButton(
-                size = 32.dp,
-                onClick = {}
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Settings,
-                    contentDescription = "",
-                    tint = MaterialTheme.colorScheme.onSecondary
-                )
+            headerContent()
+            if (hasSettings) {
+                RoundedButton(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    size = 32.dp,
+                    onClick = onSettingsClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
         },
-        bodyContent = {}
+        bodyContent = {
+            bodyContent()
+        }
     )
 }

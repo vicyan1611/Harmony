@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -26,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.harmony.R
@@ -39,8 +41,8 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
             .fillMaxWidth(),
 //            .heightIn(max = LocalConfiguration.current.screenHeightDp.dp * 0.2f), // set max height when fully expand, but it does not work ??
         // sheetState = rememberModalBottomSheetState(true), // skip partially expand
-        containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
     ) {
         Column (
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -100,17 +102,6 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
                 }
             }
 
-            // bio
-//            MultiLineTextField(
-//                modifier = Modifier.fillMaxWidth(),
-//                editable = false,
-//                text = bio,
-//                onValueChange = {},
-//                textStyle = TextStyle(
-//                    fontSize = 16.sp,
-//                    lineHeight = 24.sp
-//                )
-//            )
             Row (
                 modifier = Modifier
                     .fillMaxWidth()
@@ -133,8 +124,12 @@ fun UserProfileLayout(displayedName: String = "", username: String = "", bio: St
                     HarmonyTextField(
                         value = bio,
                         onValueChange = {},
-                        modifier = Modifier.fillMaxWidth(),
-                        isEditable = false
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 140.dp),
+                        isEditable = false,
+                        trailingIcon = {},
+                        maxLines = 10,
+                        singleLine = false,
+                        imeAction = ImeAction.Done
                     )
                 }
 
