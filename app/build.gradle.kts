@@ -94,6 +94,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.runtime.livedata)
 }
 
 //kapt {
