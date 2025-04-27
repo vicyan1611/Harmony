@@ -1,25 +1,60 @@
 package com.example.harmony.data.repository
 
-import android.net.Uri
 import com.example.harmony.core.common.Constants
 import com.example.harmony.core.common.Resource
 import com.example.harmony.domain.model.User
+import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.UserRepository
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor (
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val authRepository: AuthRepository
 ): UserRepository {
     companion object {
         const val USER_LIST_JOINED_SERVER_IDS_FIELD = "listJoinedServerIds"
     }
+
+    override fun searchUsers(query: String): Flow<Resource<List<User>>> = flow {
+        emit(Resource.Loading())
+        val currentUserId = authRepository.getCurrentUser()?.id
+
+        try {
+            if (query.isBlank()) {
+                emit(Resource.Success(emptyList()))
+                return@flow
+            }
+
+            val usersSnapshot = firestore.collection(Constants.USERS_COLLECTION)
+                .orderBy("displayName")
+                .whereGreaterThanOrEqualTo("displayName", query)
+                .whereLessThanOrEqualTo("displayName", query + '\uf8ff')
+                .limit(20)
+                .get()
+                .await()
+
+            val users = usersSnapshot.documents.mapNotNull { doc ->
+                if (doc.id != currentUserId) {
+                    doc.toObject(User::class.java)?.copy(id = doc.id)
+                } else {
+                    null
+                }
+            }
+            emit(Resource.Success(users))
+
+        } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
+        }
+
+    }
+
     override fun getListJoinedServerIdByUser(userId: String): Flow<Resource<List<String>>> = flow {
         emit(Resource.Loading())
         try {
