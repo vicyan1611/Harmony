@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun HomeScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToChat: (serverId: String, channelId: String) -> Unit,
+    onNavigateToDmList: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -59,7 +60,7 @@ fun HomeScreen(
                     color = MaterialTheme.colorScheme.error
                 )
             } else if (state.user != null) {
-                Column (
+                Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -86,6 +87,14 @@ fun HomeScreen(
                             // Use the hardcoded IDs to navigate
                             onNavigateToChat(testServerId, testChannelId)
                         },
+                        isLoading = false // Not tied to logout state
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    HarmonyButton(
+                        text = "Test Direct Messages",
+                        onClick = onNavigateToDmList, // Use the passed lambda
                         isLoading = false // Not tied to logout state
                     )
 

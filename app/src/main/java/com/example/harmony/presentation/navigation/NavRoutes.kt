@@ -14,6 +14,12 @@ object NavRoutes {
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
 
+    // Direct Message Routes
+    const val DM_LIST = "dm_list"
+    const val DM_CHAT = "dm_chat/{conversationId}"
+    // Optional: Add a route for user search to initiate DMs
+    const val USER_SEARCH = "user_search"
+
     // Utility function for route with parameters
     fun getServerDetailRoute(serverId: String): String {
         return "server_detail/$serverId"
@@ -25,5 +31,10 @@ object NavRoutes {
 
     fun getChatRoute(serverId: String, channelId: String): String {
         return "server/$serverId/channel/$channelId/chat"
+    }
+
+    // Helper for DM Chat route <<< NEW
+    fun getDmChatRoute(conversationId: String): String {
+        return "dm_chat/$conversationId"
     }
 }

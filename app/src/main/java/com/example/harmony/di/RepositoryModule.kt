@@ -1,8 +1,10 @@
 package com.example.harmony.di
 
 import com.example.harmony.data.repository.AuthRepositoryImpl
+import com.example.harmony.data.repository.DirectMessageRepositoryImpl
 import com.example.harmony.data.repository.MessageRepositoryImpl
 import com.example.harmony.domain.repository.AuthRepository
+import com.example.harmony.domain.repository.DirectMessageRepository
 import com.example.harmony.domain.repository.MessageRepository
 import dagger.Binds
 import dagger.Module
@@ -26,4 +28,9 @@ abstract class RepositoryModule {
         messageRepositoryImpl: MessageRepositoryImpl
     ): MessageRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindDirectMessageRepositoryImpl(
+        directMessageRepositoryImpl: DirectMessageRepositoryImpl
+    ): DirectMessageRepository
 }
