@@ -10,8 +10,8 @@ import javax.inject.Inject
 class RegisterUseCase @Inject constructor(
     private val authRepository: AuthRepository
 ) {
-    operator fun invoke(username: String, email: String, password: String): Flow<Resource<User>> {
+    operator fun invoke(displayName: String, email: String, password: String): Flow<Resource<User>> {
         Log.d("Register test", "Use case invoke")
-        return authRepository.register(username, email, password)
+        return authRepository.register(displayName, email, password)
     }
 }

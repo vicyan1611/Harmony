@@ -22,4 +22,32 @@
     <string name="server_creation_invite_sharelinkButton">Share Link</string>
     <string name="server_creation_servername_label">Server Name</string>
     <string name="server_creation_createbutton">Create Server</string>
+
+    <string name="my_profile_title">My Profile</string>
+    <string name="edit_profile_action">Edit Profile</string>
+    <string name="error_prefix">Error</string>
+    <string name="retry_button">Retry</string>
+    <string name="language_label">Language</string>
+    <string name="theme_label">Theme</string>
+    <string name="logout_button">Logout</string>
+    <string name="profile_unavailable">Profile not available.</string>
+    <string name="refresh_button">Refresh</string>
+
+    <string name="edit_profile_title">Edit Profile</string>
+    <string name="username_label">Username</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="language_settings_title">Language Settings</string>
+    <string name="theme_settings_title">Theme Settings</string>
+    <string name="error_username_empty">Username cannot be empty</string>
+    <string name="error_no_changes">No changes to save</string>
+    <string name="settings_saved_success">Settings saved successfully!</string> <string name="login_welcome">Welcome Back</string>
+    <string name="login_prompt">Sign in to continue</string>
+    <string name="register_title">Create Account</string>
+    <string name="register_prompt">Sign up to get started</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="back_action">Back</string>
+    <string name="app_language_label">App Language</string>
+    <string name="profile_avatar_description">Profile Avatar</string>
+    <string name="select_avatar_action">Select avatar</string>
 </resources>

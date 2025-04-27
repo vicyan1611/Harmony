@@ -1,24 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Harmony</string>
-    <string name="delete_friend_prompt_description">Bạn có chắc muốn xóa người này khỏi nhóm bạn bè không?</string>
-    <string name="add_a_new_channel">Tạo channel mới</string>
     <string name="avatar">Ảnh đại diện</string>
     <string name="title_activity_profile">Hồ sơ</string>
     <string name="delete_friend_prompt_header">Xóa</string>
-    <string name="delete_friend_prompt_btnDel">"Xóa "</string>
+    <string name="delete_friend_prompt_description">Vui lòng đảm bảo bạn muốn xóa người này vĩnh viễn khỏi danh sách bạn bè.</string>
+    <string name="add_a_new_channel">Thêm kênh mới</string>
+    <string name="delete_friend_prompt_btnDel">Xóa bạn bè</string>
     <string name="delete_friend_prompt_btnDismiss">Bỏ qua</string>
     <string name="view_profile_send_message_button">Tin nhắn</string>
-    <string name="view_profile_audio_call_button">Cuộc gọi thoại</string>
-    <string name="view_profile_video_call_button">Cuộc gọi video</string>
+    <string name="view_profile_audio_call_button">Gọi thoại</string>
+    <string name="view_profile_video_call_button">Gọi video</string>
     <string name="view_profile_add_friend_button">Thêm bạn</string>
-    <string name="view_profile_bio_title">Giới thiệu</string>
-    <string name="server_creation_servername_title">Tạo Máy Chủ Của Bạn</string>
-    <string name="server_creation_servername_description">Tạo máy chủ của riêng bạn và bắt đầu trò chuyện</string>
+    <string name="view_profile_bio_title">Tiểu sử</string>
+    <string name="server_creation_servername_title">Tạo máy chủ của bạn</string>
+    <string name="server_creation_servername_description">Tạo máy chủ riêng và bắt đầu trò chuyện</string>
     <string name="server_creation_invite_doneButton">Bỏ qua</string>
-    <string name="server_creation_invite_title">Thêm một vài người</string>
-    <string name="server_creation_invite_description">Hãy mời một vài người bạn</string>
-    <string name="server_creation_invite_sharelinkButton">Chia sẻ link</string>
+    <string name="server_creation_invite_title">Mời ai đó</string>
+    <string name="server_creation_invite_description">Mời bạn bè tham gia cùng bạn</string>
+    <string name="server_creation_invite_sharelinkButton">Chia sẻ liên kết</string>
     <string name="server_creation_servername_label">Tên máy chủ</string>
     <string name="server_creation_createbutton">Tạo máy chủ</string>
+
+    <string name="my_profile_title">Hồ sơ của tôi</string>
+    <string name="edit_profile_action">Chỉnh sửa hồ sơ</string>
+    <string name="error_prefix">Lỗi</string>
+    <string name="retry_button">Thử lại</string>
+    <string name="language_label">Ngôn ngữ</string>
+    <string name="theme_label">Giao diện</string>
+    <string name="logout_button">Đăng xuất</string>
+    <string name="profile_unavailable">Hồ sơ không khả dụng.</string>
+    <string name="refresh_button">Làm mới</string>
+
+    <string name="edit_profile_title">Chỉnh sửa hồ sơ</string>
+    <string name="username_label">Tên người dùng</string>
+    <string name="save_changes">Lưu thay đổi</string>
+    <string name="language_settings_title">Cài đặt ngôn ngữ</string>
+    <string name="theme_settings_title">Cài đặt giao diện</string>
+    <string name="error_username_empty">Tên người dùng không được để trống</string>
+    <string name="error_no_changes">Không có thay đổi để lưu</string>
+    <string name="settings_saved_success">Cài đặt đã được lưu thành công!</string>
+    <string name="login_welcome">Chào mừng trở lại</string>
+    <string name="login_prompt">Đăng nhập để tiếp tục</string>
+    <string name="register_title">Tạo tài khoản</string>
+    <string name="register_prompt">Đăng ký để bắt đầu</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Mật khẩu</string>
+    <string name="back_action">Quay lại</string>
+    <string name="app_language_label">Ngôn ngữ ứng dụng</string>
+    <string name="profile_avatar_description">Ảnh đại diện hồ sơ</string>
+    <string name="select_avatar_action">Chọn ảnh đại diện</string>
 </resources>

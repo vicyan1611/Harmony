@@ -15,11 +15,6 @@
         android:theme="@style/Theme.Harmony"
         tools:targetApi="31">
         <activity
-            android:name=".composes.test.Profile"
-            android:exported="false"
-            android:label="@string/title_activity_profile"
-            android:theme="@style/Theme.Harmony" />
-        <activity
             android:name=".Search"
             android:exported="false" />
         <activity

@@ -65,7 +65,7 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Logged in as: ${state.user?.username ?: "Unknown"}",
+                        text = "Logged in as: ${state.user?.displayName ?: "Unknown"}",
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Spacer(modifier = Modifier.height(8.dp))

@@ -13,6 +13,9 @@ object NavRoutes {
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
 
+    const val EDIT_PROFILE = "edit_profile"
+    const val MY_PROFILE = "my_profile"
+
     // Utility function for route with parameters
     fun getServerDetailRoute(serverId: String): String {
         return "server_detail/$serverId"
