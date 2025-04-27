@@ -11,5 +11,6 @@ data class Message (
     val senderPhotoUrl: String? = null,
     val text: String = "",
     @ServerTimestamp
-    val  timestamp: Timestamp? = null
+    val timestamp: Timestamp? = null,
+    val imageUrl: String? = null
 )
