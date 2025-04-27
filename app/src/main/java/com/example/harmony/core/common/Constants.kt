@@ -7,6 +7,7 @@ object Constants {
     const val SERVERS_COLLECTION = "servers"
     const val CHANNELS_COLLECTION = "channels"
     const val MESSAGES_COLLECTION = "messages"
+    const val DIRECT_MESSAGES_COLLECTION = "direct_messages"
 
     //
 

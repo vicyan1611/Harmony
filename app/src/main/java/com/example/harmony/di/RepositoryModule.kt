@@ -1,11 +1,13 @@
 package com.example.harmony.di
 
 import com.example.harmony.data.repository.AuthRepositoryImpl
+import com.example.harmony.data.repository.DirectMessageRepositoryImpl
 import com.example.harmony.data.repository.ChannelRepositoryImpl
 import com.example.harmony.data.repository.ServerRepositoryImpl
 import com.example.harmony.data.repository.UserRepositoryImpl
 import com.example.harmony.data.repository.MessageRepositoryImpl
 import com.example.harmony.domain.repository.AuthRepository
+import com.example.harmony.domain.repository.DirectMessageRepository
 import com.example.harmony.domain.repository.ChannelRepository
 import com.example.harmony.domain.repository.ServerRepository
 import com.example.harmony.domain.repository.UserRepository
@@ -50,4 +52,9 @@ abstract class RepositoryModule {
         messageRepositoryImpl: MessageRepositoryImpl
     ): MessageRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindDirectMessageRepositoryImpl(
+        directMessageRepositoryImpl: DirectMessageRepositoryImpl
+    ): DirectMessageRepository
 }
