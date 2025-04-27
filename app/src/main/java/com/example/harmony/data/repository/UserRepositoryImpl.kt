@@ -28,42 +28,26 @@ import kotlinx.coroutines.tasks.await
 import java.util.UUID
 import javax.inject.Inject
 
-class UserRepositoryImpl @Inject constructor(
-    private val auth: FirebaseAuth,
 class UserRepositoryImpl @Inject constructor (
     private val firestore: FirebaseFirestore,
-    private val storage: FirebaseStorage
-) : UserRepository {
+    private val storage: FirebaseStorage,
+    private val auth: FirebaseAuth,
     private val authRepository: AuthRepository
-): UserRepository {
+) : UserRepository {
     companion object {
         const val USER_LIST_JOINED_SERVER_IDS_FIELD = "listJoinedServerIds"
     }
 
-    // This flow now primarily focuses on listening to Firestore *if* the user is logged in when called.
-    // It will emit an error and complete if the user is not logged in at call time.
-    override fun getUser(): Flow<Resource<User>> = callbackFlow {
-        trySend(Resource.Loading()) // Start with loading
     override fun searchUsers(query: String): Flow<Resource<List<User>>> = flow {
         emit(Resource.Loading())
         val currentUserId = authRepository.getCurrentUser()?.id
 
-        val userId = auth.currentUser?.uid
-        if (userId == null) {
-            Log.d("UserRepositoryImpl", "getUser: User not logged in, sending error.")
-            trySend(Resource.Error("User not logged in"))
-            close() // Close the flow as there's nothing more to listen to *for this specific call*
-            return@callbackFlow
-        }
         try {
             if (query.isBlank()) {
                 emit(Resource.Success(emptyList()))
                 return@flow
             }
 
-        Log.d("UserRepositoryImpl", "getUser: User logged in ($userId), attaching Firestore listener.")
-        val userRef = firestore.collection(USERS_COLLECTION).document(userId)
-        var listenerRegistration: ListenerRegistration? = null // Define here
             val usersSnapshot = firestore.collection(Constants.USERS_COLLECTION)
                 .orderBy("displayName")
                 .whereGreaterThanOrEqualTo("displayName", query)
@@ -72,26 +56,10 @@ class UserRepositoryImpl @Inject constructor (
                 .get()
                 .await()
 
-        listenerRegistration = userRef.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                Log.e("UserRepositoryImpl", "getUser: Firestore listener error", error)
-                trySend(Resource.Error(error.localizedMessage ?: ERROR_SOMETHING_WENT_WRONG))
-                // Optionally close on persistent errors, but maybe let it retry?
-                // close(error)
-                return@addSnapshotListener
-            }
-
-            if (snapshot != null && snapshot.exists()) {
-                val user = snapshot.toObject(User::class.java)?.copy(id = snapshot.id)
-                if (user != null) {
-                    Log.d("UserRepositoryImpl", "getUser: Sending user data: ${user.displayName}")
-                    trySend(Resource.Success(user))
             val users = usersSnapshot.documents.mapNotNull { doc ->
                 if (doc.id != currentUserId) {
                     doc.toObject(User::class.java)?.copy(id = doc.id)
                 } else {
-                    Log.w("UserRepositoryImpl", "getUser: Failed to parse user data from snapshot.")
-                    trySend(Resource.Error("Failed to parse user data"))
                     null
                 }
             }
@@ -125,9 +93,6 @@ class UserRepositoryImpl @Inject constructor (
                     emit(Resource.Success(emptyList())) // Return empty list if field is missing/null
                 }
             } else {
-                // Snapshot might be null briefly during setup or if document deleted
-                Log.w("UserRepositoryImpl", "getUser: User document does not exist for user $userId.")
-                trySend(Resource.Error("User document does not exist"))
                 emit(Resource.Error("User document not found."))
             }
         } catch (e: ClassCastException) {
@@ -141,10 +106,6 @@ class UserRepositoryImpl @Inject constructor (
         emit(Resource.Error(exception.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
     }
 
-        // This is crucial: close the Firestore listener when the flow collection stops.
-        awaitClose {
-            Log.d("UserRepositoryImpl", "getUser: Closing Firestore listener for user $userId.")
-            listenerRegistration?.remove()
     override fun appendListJoinedServerIds(userId: String, serverId: String): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading()) // Indicate the operation is starting
         try {
@@ -167,8 +128,135 @@ class UserRepositoryImpl @Inject constructor (
         emit(Resource.Error(exception.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
     }
 
-    override fun updateProfile(displayName: String?, avatarUri: Uri?): Flow<Resource<User>> = flow {
     override fun getCollectionUser(userId: String): Flow<Resource<User>> = flow {
+        emit(Resource.Loading())
+        try {
+            val documentSnapshot = firestore.collection(Constants.USERS_COLLECTION)
+                .document(userId)
+                .get()
+                .await()
+            if (documentSnapshot.exists()) {
+                val user = documentSnapshot.toObject(User::class.java)
+                if (user != null) {
+                    emit(Resource.Success(user))
+                } else {
+                    emit(Resource.Error("User data is null."))
+                }
+            } else {
+                emit(Resource.Error("User document not found."))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
+        }
+    }.catch { exception ->
+        // Catch exceptions specific to the flow itself
+        emit(Resource.Error(exception.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
+    }
+
+    override fun removeServerFromAllUsers(serverId: String): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
+        try {
+            // 1. Get the reference to the server being removed
+            val serverDocRef = firestore.collection(Constants.SERVERS_COLLECTION).document(serverId)
+
+            // 2. Query users containing this server reference (INEFFICIENT & REQUIRES INDEX)
+            // This query requires a composite index on 'listJoinedServerIds' in Firestore.
+            // It fetches potentially ALL user documents containing the reference.
+            val usersQuery = firestore.collection(Constants.USERS_COLLECTION)
+                .whereArrayContains(USER_LIST_JOINED_SERVER_IDS_FIELD, serverDocRef)
+
+            val usersSnapshot = usersQuery.get().await()
+
+            if (usersSnapshot.isEmpty) {
+                // No users found with this server, operation successful.
+                emit(Resource.Success(Unit))
+                return@flow
+            }
+
+            // 3. Use WriteBatch for atomic removal (up to 500 writes per batch)
+            var batch: WriteBatch = firestore.batch()
+            var writeCount = 0
+
+            for (userDoc in usersSnapshot.documents) {
+                val userRef = userDoc.reference
+                // Add an update operation to remove the server reference from the array
+                batch.update(userRef, USER_LIST_JOINED_SERVER_IDS_FIELD, FieldValue.arrayRemove(serverDocRef))
+                writeCount++
+
+                // Firestore batches have a limit (e.g., 500 writes). Commit and create a new batch if needed.
+                if (writeCount >= 499) { // Commit slightly before limit for safety
+                    batch.commit().await()
+                    batch = firestore.batch() // Start a new batch
+                    writeCount = 0
+                }
+            }
+
+            // 4. Commit any remaining operations in the last batch
+            if (writeCount > 0) {
+                batch.commit().await()
+            }
+
+            emit(Resource.Success(Unit)) // Indicate overall success
+
+        } catch (e: Exception) {
+            // Handle potential exceptions (network, permissions, query errors, batch errors)
+            emit(Resource.Error(e.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
+        }
+    }.catch { exception ->
+        // Catch exceptions specific to the flow itself
+        emit(Resource.Error(exception.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
+    }
+
+    // This flow now primarily focuses on listening to Firestore *if* the user is logged in when called.
+    // It will emit an error and complete if the user is not logged in at call time.
+    override fun getUser(): Flow<Resource<User>> = callbackFlow {
+        trySend(Resource.Loading()) // Start with loading
+
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            Log.d("UserRepositoryImpl", "getUser: User not logged in, sending error.")
+            trySend(Resource.Error("User not logged in"))
+            close() // Close the flow as there's nothing more to listen to *for this specific call*
+            return@callbackFlow
+        }
+
+        Log.d("UserRepositoryImpl", "getUser: User logged in ($userId), attaching Firestore listener.")
+        val userRef = firestore.collection(USERS_COLLECTION).document(userId)
+        var listenerRegistration: ListenerRegistration? = null // Define here
+
+        listenerRegistration = userRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.e("UserRepositoryImpl", "getUser: Firestore listener error", error)
+                trySend(Resource.Error(error.localizedMessage ?: ERROR_SOMETHING_WENT_WRONG))
+                // Optionally close on persistent errors, but maybe let it retry?
+                // close(error)
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                val user = snapshot.toObject(User::class.java)?.copy(id = snapshot.id)
+                if (user != null) {
+                    Log.d("UserRepositoryImpl", "getUser: Sending user data: ${user.displayName}")
+                    trySend(Resource.Success(user))
+                } else {
+                    Log.w("UserRepositoryImpl", "getUser: Failed to parse user data from snapshot.")
+                    trySend(Resource.Error("Failed to parse user data"))
+                }
+            } else {
+                // Snapshot might be null briefly during setup or if document deleted
+                Log.w("UserRepositoryImpl", "getUser: User document does not exist for user $userId.")
+                trySend(Resource.Error("User document does not exist"))
+            }
+        }
+
+        // This is crucial: close the Firestore listener when the flow collection stops.
+        awaitClose {
+            Log.d("UserRepositoryImpl", "getUser: Closing Firestore listener for user $userId.")
+            listenerRegistration?.remove()
+        }
+    }
+
+    override fun updateProfile(displayName: String?, avatarUri: Uri?): Flow<Resource<User>> = flow {
         emit(Resource.Loading())
 
         val userId = auth.currentUser?.uid
@@ -216,35 +304,18 @@ class UserRepositoryImpl @Inject constructor (
             if (updatedUser != null) {
                 Log.d("UserRepositoryImpl", "updateProfile: Successfully updated and returning user.")
                 emit(Resource.Success(updatedUser))
-            val documentSnapshot = firestore.collection(Constants.USERS_COLLECTION)
-                .document(userId)
-                .get()
-                .await()
-            if (documentSnapshot.exists()) {
-                val user = documentSnapshot.toObject(User::class.java)
-                if (user != null) {
-                    emit(Resource.Success(user))
-                } else {
-                    emit(Resource.Error("User data is null."))
-                }
             } else {
                 Log.w("UserRepositoryImpl", "updateProfile: Failed to fetch updated user data after update.")
                 emit(Resource.Error("Failed to fetch updated user data after update"))
-                emit(Resource.Error("User document not found."))
             }
 
         } catch (e: Exception) {
             Log.e("UserRepositoryImpl", "updateProfile: Error updating profile", e)
             emit(Resource.Error(e.localizedMessage ?: "Failed to update profile"))
-            emit(Resource.Error(e.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
         }
-    }.catch { exception ->
-        // Catch exceptions specific to the flow itself
-        emit(Resource.Error(exception.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
     }
 
     override fun updateUserSettings(userId: String, newSettings: UserSettings): Flow<Resource<UserSettings>> = flow {
-    override fun removeServerFromAllUsers(serverId: String): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
         if (userId.isBlank()) {
             emit(Resource.Error("User ID is invalid"))
@@ -256,57 +327,9 @@ class UserRepositoryImpl @Inject constructor (
             Log.d("UserRepositoryImpl", "updateUserSettings: Updating settings for user $userId: $settingsWithTimestamp")
             userRef.update("settings", settingsWithTimestamp).await()
             emit(Resource.Success(settingsWithTimestamp))
-        try {
-            // 1. Get the reference to the server being removed
-            val serverDocRef = firestore.collection(Constants.SERVERS_COLLECTION).document(serverId)
-
-            // 2. Query users containing this server reference (INEFFICIENT & REQUIRES INDEX)
-            // This query requires a composite index on 'listJoinedServerIds' in Firestore.
-            // It fetches potentially ALL user documents containing the reference.
-            val usersQuery = firestore.collection(Constants.USERS_COLLECTION)
-                .whereArrayContains(USER_LIST_JOINED_SERVER_IDS_FIELD, serverDocRef)
-
-            val usersSnapshot = usersQuery.get().await()
-
-            if (usersSnapshot.isEmpty) {
-                // No users found with this server, operation successful.
-                emit(Resource.Success(Unit))
-                return@flow
-            }
-
-            // 3. Use WriteBatch for atomic removal (up to 500 writes per batch)
-            var batch: WriteBatch = firestore.batch()
-            var writeCount = 0
-
-            for (userDoc in usersSnapshot.documents) {
-                val userRef = userDoc.reference
-                // Add an update operation to remove the server reference from the array
-                batch.update(userRef, USER_LIST_JOINED_SERVER_IDS_FIELD, FieldValue.arrayRemove(serverDocRef))
-                writeCount++
-
-                // Firestore batches have a limit (e.g., 500 writes). Commit and create a new batch if needed.
-                if (writeCount >= 499) { // Commit slightly before limit for safety
-                    batch.commit().await()
-                    batch = firestore.batch() // Start a new batch
-                    writeCount = 0
-                }
-            }
-
-            // 4. Commit any remaining operations in the last batch
-            if (writeCount > 0) {
-                batch.commit().await()
-            }
-
-            emit(Resource.Success(Unit)) // Indicate overall success
-
         } catch (e: Exception) {
             Log.e("UserRepositoryImpl", "updateUserSettings: Error updating settings", e)
             emit(Resource.Error(e.localizedMessage ?: "Failed to update settings"))
-            // Handle potential exceptions (network, permissions, query errors, batch errors)
-            emit(Resource.Error(e.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
         }
-    }.catch { exception ->
-        // Catch exceptions specific to the flow itself
-        emit(Resource.Error(exception.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
     }
 }

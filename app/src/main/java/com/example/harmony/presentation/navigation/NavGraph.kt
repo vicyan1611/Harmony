@@ -18,6 +18,8 @@ import com.example.harmony.presentation.main.dm.DirectMessageChatScreen
 import com.example.harmony.presentation.main.dm.DirectMessageListScreen
 import com.example.harmony.presentation.main.home.HomeScreen
 import com.example.harmony.presentation.main.join_server.JoinServerScreen
+import com.example.harmony.presentation.main.profile.MyProfileScreen
+import com.example.harmony.presentation.main.profile.edit.EditProfileScreen
 import com.example.harmony.presentation.main.search.UserSearchScreen
 
 @Composable
@@ -105,6 +107,23 @@ fun NavGraph(
 
         composable(route = NavRoutes.SETTINGS) {
             Text("Settings Screen")
+            MyProfileScreen(
+                onNavigateToEditProfile = { navController.navigate(NavRoutes.EDIT_PROFILE) },
+                onNavigateToLogin = {
+                    navController.navigate(NavRoutes.LOGIN) {
+                        // Clear backstack up to home or splash depending on flow
+                        popUpTo(NavRoutes.HOME) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        // Composable for editing profile
+        composable(route = NavRoutes.EDIT_PROFILE) {
+            EditProfileScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
 
         composable(route = NavRoutes.JOIN_SERVER) {

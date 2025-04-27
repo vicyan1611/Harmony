@@ -7,8 +7,7 @@ data class User(
     val photoUrl: String? = null,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
-    val settings: UserSettings? = UserSettings()
-    val updatedAt: Long = System.currentTimeMillis(),
+    val settings: UserSettings? = UserSettings(),
     val bio: String = ""
 )
 {
