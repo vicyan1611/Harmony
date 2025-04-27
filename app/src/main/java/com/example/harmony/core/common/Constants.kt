@@ -8,6 +8,11 @@ object Constants {
     const val CHANNELS_COLLECTION = "channels"
     const val MESSAGES_COLLECTION = "messages"
 
+    //
+
+    // Invite to a server
+    const val INVITE_BASE_URL = "https://example.com"
+
     // Error Messages
     const val ERROR_SOMETHING_WENT_WRONG = "Something went wrong"
     const val ERROR_INVALID_CREDENTIALS = "The email or password is incorrect"
