@@ -92,7 +92,7 @@ fun OtherUserProfile(displayedName: String = "", username: String = "", isFriend
                         text = stringResource(R.string.view_profile_send_message_button),
                         style = TextStyle(
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSecondary,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     )
                 }
