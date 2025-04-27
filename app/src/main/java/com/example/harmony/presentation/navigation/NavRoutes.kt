@@ -23,6 +23,9 @@ object NavRoutes {
     // Optional: Add a route for user search to initiate DMs
     const val USER_SEARCH = "user_search"
 
+    const val EDIT_PROFILE = "edit_profile"
+    const val MY_PROFILE = "my_profile"
+
     // Utility function for route with parameters
     fun getServerDetailRoute(serverId: String): String {
         return "server_detail/$serverId"

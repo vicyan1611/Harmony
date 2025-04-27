@@ -94,18 +94,10 @@ class AuthRepositoryImpl @Inject constructor(
             try {
                 emit(Resource.Loading<User>())
                 val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-                val firebaseUser = authResult.user ?: throw Exception(ERROR_SOMETHING_WENT_WRONG)
-                val userId = firebaseUser.uid
-
-                val profileUpdates = UserProfileChangeRequest.Builder()
-                    .setDisplayName(displayName)
-                    // .setPhotoUri(Uri.parse("your_photo_url")) // Optionally set photo URL here too
-                    .build()
-                firebaseUser.updateProfile(profileUpdates).await()
-
+                val userId = authResult.user?.uid ?: throw Exception(ERROR_SOMETHING_WENT_WRONG)
                 val user = User(
                     id = userId,
-                    displayName = displayName,
+                    displayName = username,
                     email = email
                 )
                 firestore.collection(USERS_COLLECTION).document(userId).set(user).await()
