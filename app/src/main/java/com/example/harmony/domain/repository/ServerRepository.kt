@@ -14,4 +14,10 @@ interface ServerRepository {
     fun getServerById(serverId: String): Flow<Resource<Server>>
 
 //    fun getServerListByUser(): Flow<Resource<List<Server>>>
+
+    fun deleteServer(serverId: String): Flow<Resource<Unit>>
+
+    fun updateServer(serverId: String, name: String?, profileUrl: String?): Flow<Resource<Unit>>
+
+    fun addMemberToServer(serverId: String, memberId: String): Flow<Resource<Unit>>
 }

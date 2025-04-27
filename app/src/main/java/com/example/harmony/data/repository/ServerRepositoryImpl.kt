@@ -7,9 +7,12 @@ import com.example.harmony.domain.model.Channel
 import com.example.harmony.domain.model.Server
 import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.ServerRepository
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -116,6 +119,35 @@ class ServerRepositoryImpl @Inject constructor (
         }
     }
 
+    override fun updateServer(serverId: String, name: String?, profileUrl: String?): Flow<Resource<Unit>> = flow {
+        try {
+            emit(Resource.Loading<Unit>())
+            val serverRef =
+                Firebase.firestore.collection(Constants.SERVERS_COLLECTION).document(serverId)
+            if (name != null) {
+                serverRef.update(SERVER_NAME_FIELD, name).await()
+            }
+            if (profileUrl != null) {
+                serverRef.update(SERVER_PROFILE_URL_FIELD, profileUrl).await()
+            }
+            emit(Resource.Success<Unit>(Unit))
+        } catch (t: Throwable) {
+            emit(Resource.Error<Unit>(t.message.toString()))
+        }
+    }
+
+    override fun deleteServer(serverId: String): Flow<Resource<Unit>> = flow {
+        try {
+            emit(Resource.Loading<Unit>())
+            val serverRef =
+                Firebase.firestore.collection(Constants.SERVERS_COLLECTION).document(serverId)
+            serverRef.delete().await()
+            emit(Resource.Success<Unit>(Unit))
+        } catch (t: Throwable) {
+            emit(Resource.Error<Unit>(t.message.toString()))
+        }
+    }
+
 //    override fun getServerListByUser(): Flow<Resource<List<Server>>> = flow {
 //        // override fun getServerListByUser(): Flow<Resource<ArrayList<Server>>> = flow { // If ArrayList is strictly needed
 //        emit(Resource.Loading())
@@ -164,4 +196,16 @@ class ServerRepositoryImpl @Inject constructor (
 //    }.catch { exception ->
 //        emit(Resource.Error(exception.localizedMessage ?: "Failed to fetch server list"))
 //    }
+
+    override fun addMemberToServer(serverId: String, memberId: String): Flow<Resource<Unit>> = flow {
+        try {
+            emit(Resource.Loading<Unit>())
+            val serverRef =
+                Firebase.firestore.collection(Constants.SERVERS_COLLECTION).document(serverId)
+            serverRef.update(SERVER_MEMBERS_LIST_FIELD, FieldValue.arrayUnion(memberId)).await()
+            emit(Resource.Success<Unit>(Unit))
+        } catch (t: Throwable) {
+            emit(Resource.Error<Unit>(t.message.toString()))
+        }
+    }
 }

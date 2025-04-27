@@ -12,10 +12,12 @@ import com.example.harmony.presentation.auth.login.LoginScreen
 import com.example.harmony.presentation.auth.register.RegisterScreen
 import com.example.harmony.presentation.auth.splash.SplashScreen
 import com.example.harmony.presentation.main.chat.ChatScreen
+import com.example.harmony.presentation.main.config_server.ConfigServerScreen
 import com.example.harmony.presentation.main.create_server.CreateServerScreen
 import com.example.harmony.presentation.main.dm.DirectMessageChatScreen
 import com.example.harmony.presentation.main.dm.DirectMessageListScreen
 import com.example.harmony.presentation.main.home.HomeScreen
+import com.example.harmony.presentation.main.join_server.JoinServerScreen
 import com.example.harmony.presentation.main.search.UserSearchScreen
 
 @Composable
@@ -71,10 +73,26 @@ fun NavGraph(
             )
         }
 
+//        Config Server
+        composable(
+            route = NavRoutes.CONFIG_SERVER, // Use the route pattern with placeholder
+            arguments = listOf(navArgument("serverId") { type = NavType.StringType }) // Define the argument
+        ) { backStackEntry ->
+            // The NavController and ViewModel handle the argument extraction internally
+            // via SavedStateHandle when using hiltViewModel()
+            ConfigServerScreen(
+                navController = navController
+                // ViewModel will be injected by Hilt and get the serverId from SavedStateHandle
+            )
+        }
+
 //         Main Screens
         composable(route = NavRoutes.HOME) {
             HomeScreen(
                 navController = navController,
+                onNavigateToJoinServer = {
+                    navController.navigate(NavRoutes.JOIN_SERVER)
+                }
             )
         }
 
@@ -87,6 +105,17 @@ fun NavGraph(
 
         composable(route = NavRoutes.SETTINGS) {
             Text("Settings Screen")
+        }
+
+        composable(route = NavRoutes.JOIN_SERVER) {
+            JoinServerScreen(
+                navController = navController,
+                onJoinSuccess = {
+                    navController.navigate(NavRoutes.HOME) {
+                        popUpTo(NavRoutes.JOIN_SERVER) { inclusive = true }
+                    }
+                }
+            )
         }
 
 //        Channel chat

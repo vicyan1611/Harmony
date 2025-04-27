@@ -17,7 +17,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PlusOne
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,7 +40,8 @@ fun ServerListSidebar(
     onAddServerClick: () -> Unit,
     onDmButtonClick: () -> Unit,
     isLoading: Boolean, // To show placeholders or loading indicator
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onJoinServerClick: () -> Unit
 ) {
     val sidebarColor = MaterialTheme.colorScheme.background // Or choose a darker color
     Column(
@@ -109,13 +112,28 @@ fun ServerListSidebar(
         }
 
         RoundedButton(
+            onClick = onJoinServerClick,
+            modifier = Modifier.padding(4.dp),
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = "Add new server",
+                tint = MaterialTheme.colorScheme.onSecondary
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        RoundedButton(
             onClick = onAddServerClick,
             modifier = Modifier.padding(4.dp),
             containerColor = MaterialTheme.colorScheme.secondary,
             contentColor = MaterialTheme.colorScheme.onSecondary
         ) {
             Icon(
-                imageVector = Icons.Filled.PlusOne,
+                imageVector = Icons.Filled.Add,
                 contentDescription = "Add new server",
                 tint = MaterialTheme.colorScheme.onSecondary
             )

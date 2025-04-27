@@ -9,11 +9,13 @@ object NavRoutes {
     // Main Routes
     const val HOME = "home"
     const val CREATE_SERVER = "create_server/"
+    const val CONFIG_SERVER = "config_server/{serverId}"
     const val SERVER_DETAIL = "server_detail/{serverId}"
     const val CHANNEL_DETAIL = "channel_detail/{channelId}"
     const val CHAT = "server/{serverId}/channel/{channelId}/chat"
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
+    const val JOIN_SERVER = "join_server"
 
     // Direct Message Routes
     const val DM_LIST = "dm_list"
@@ -24,6 +26,11 @@ object NavRoutes {
     // Utility function for route with parameters
     fun getServerDetailRoute(serverId: String): String {
         return "server_detail/$serverId"
+    }
+
+    fun getConfigServerRoute(serverId: String): String {
+        // Replace the placeholder with the actual serverId
+        return "config_server/$serverId"
     }
 
     fun getChannelDetailRoute(channelId: String): String {

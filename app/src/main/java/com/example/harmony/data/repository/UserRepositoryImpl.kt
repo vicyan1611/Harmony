@@ -8,6 +8,7 @@ import com.example.harmony.domain.repository.UserRepository
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.WriteBatch
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -130,6 +131,60 @@ class UserRepositoryImpl @Inject constructor (
                 emit(Resource.Error("User document not found."))
             }
         } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
+        }
+    }.catch { exception ->
+        // Catch exceptions specific to the flow itself
+        emit(Resource.Error(exception.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
+    }
+
+    override fun removeServerFromAllUsers(serverId: String): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
+        try {
+            // 1. Get the reference to the server being removed
+            val serverDocRef = firestore.collection(Constants.SERVERS_COLLECTION).document(serverId)
+
+            // 2. Query users containing this server reference (INEFFICIENT & REQUIRES INDEX)
+            // This query requires a composite index on 'listJoinedServerIds' in Firestore.
+            // It fetches potentially ALL user documents containing the reference.
+            val usersQuery = firestore.collection(Constants.USERS_COLLECTION)
+                .whereArrayContains(USER_LIST_JOINED_SERVER_IDS_FIELD, serverDocRef)
+
+            val usersSnapshot = usersQuery.get().await()
+
+            if (usersSnapshot.isEmpty) {
+                // No users found with this server, operation successful.
+                emit(Resource.Success(Unit))
+                return@flow
+            }
+
+            // 3. Use WriteBatch for atomic removal (up to 500 writes per batch)
+            var batch: WriteBatch = firestore.batch()
+            var writeCount = 0
+
+            for (userDoc in usersSnapshot.documents) {
+                val userRef = userDoc.reference
+                // Add an update operation to remove the server reference from the array
+                batch.update(userRef, USER_LIST_JOINED_SERVER_IDS_FIELD, FieldValue.arrayRemove(serverDocRef))
+                writeCount++
+
+                // Firestore batches have a limit (e.g., 500 writes). Commit and create a new batch if needed.
+                if (writeCount >= 499) { // Commit slightly before limit for safety
+                    batch.commit().await()
+                    batch = firestore.batch() // Start a new batch
+                    writeCount = 0
+                }
+            }
+
+            // 4. Commit any remaining operations in the last batch
+            if (writeCount > 0) {
+                batch.commit().await()
+            }
+
+            emit(Resource.Success(Unit)) // Indicate overall success
+
+        } catch (e: Exception) {
+            // Handle potential exceptions (network, permissions, query errors, batch errors)
             emit(Resource.Error(e.localizedMessage ?: Constants.ERROR_SOMETHING_WENT_WRONG))
         }
     }.catch { exception ->

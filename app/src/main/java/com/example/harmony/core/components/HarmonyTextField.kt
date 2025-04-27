@@ -111,7 +111,7 @@ fun HarmonyTextField(
                     fontSize = 12.sp
                 ),
                 modifier = Modifier
-                    .padding(end = 8.dp, bottom = 8.dp)
+                    .padding(end = 12.dp, bottom = 20.dp)
                     .align(Alignment.BottomEnd)
             )
         }

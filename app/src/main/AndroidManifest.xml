@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
     <application
         android:name=".HarmonyApplication"
         android:allowBackup="true"
@@ -16,6 +17,49 @@
         android:theme="@style/Theme.Harmony"
         tools:targetApi="31">
         <activity
+            android:name=".presentation.InviteServerActivity"
+            android:exported="true">
+<!--            <intent-filter android:autoVerify="true">-->
+<!--                <action android:name="android.intent.action.VIEW" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+<!--                &lt;!&ndash; Accepts URIs that begin with "http://www.example.com/gizmos” &ndash;&gt;-->
+<!--                <data android:scheme="http"-->
+<!--                    android:host="www.example.com"-->
+<!--                    android:pathPrefix="/gizmos" />-->
+<!--                &lt;!&ndash; note that the leading "/" is required for pathPrefix&ndash;&gt;-->
+<!--            </intent-filter>-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.VIEW" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+<!--                &lt;!&ndash; Accepts URIs that begin with "example://gizmos” &ndash;&gt;-->
+<!--                <data android:scheme="example"-->
+<!--                    android:host="gizmos" />-->
+<!--            </intent-filter>-->
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data   android:scheme="http" />
+                <data   android:scheme="https" />
+                <data android:host="join-my-server.com" />
+            </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="app" />
+                <data android:host="join-my-server.com" />
+            </intent-filter>
+
+
+        </activity>
+        <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Harmony">
@@ -23,14 +67,6 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-            <intent-filter android:autoVerify="true"> <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="http" />
-                <data android:host="join-server-harmony.com" /> <data android:pathPattern="/.*" />
             </intent-filter>
         </activity>
     </application>
