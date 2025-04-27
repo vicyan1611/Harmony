@@ -34,7 +34,6 @@ object NavRoutes {
         return "server/$serverId/channel/$channelId/chat"
     }
 
-    // Helper for DM Chat route <<< NEW
     fun getDmChatRoute(conversationId: String): String {
         return "dm_chat/$conversationId"
     }

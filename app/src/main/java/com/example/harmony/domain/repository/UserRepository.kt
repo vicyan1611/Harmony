@@ -10,4 +10,7 @@ interface UserRepository {
     fun appendListJoinedServerIds(userId: String, serverId: String): Flow<Resource<Unit>>
 
     fun getCollectionUser(userId: String): Flow<Resource<User>>
+
+    fun searchUsers(query: String): Flow<Resource<List<User>>>
+
 }

@@ -1,31 +1,37 @@
 // harmony/presentation/main/home/HomeScreen.kt
 package com.example.harmony.presentation.main.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.* // Use Material 3 imports
+// Remove Material imports for bottom sheet
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.harmony.domain.model.Channel
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.harmony.presentation.main.home.components.AddChannelSheetContent
 import com.example.harmony.presentation.main.home.components.ChannelList
 import com.example.harmony.presentation.main.home.components.ServerListSidebar
 import com.example.harmony.presentation.navigation.NavRoutes
 import kotlinx.coroutines.flow.collectLatest
-
-import androidx.compose.material.ExperimentalMaterialApi // Still needed for PullRefresh
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
-// Remove Material imports for bottom sheet
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.harmony.presentation.main.home.components.AddChannelSheetContent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class) // Keep ExperimentalMaterialApi for PullRefresh
@@ -105,6 +111,7 @@ fun HomeScreen(
                         }
                     },
                     onAddServerClick = { viewModel.onEvent(HomeEvent.OnAddServerClicked) },
+                    onDmButtonClick = { navController.navigate(NavRoutes.DM_LIST) },
                     isLoading = state.isLoadingServers && !state.isRefreshing,
                     modifier = Modifier.fillMaxHeight()
                 )
