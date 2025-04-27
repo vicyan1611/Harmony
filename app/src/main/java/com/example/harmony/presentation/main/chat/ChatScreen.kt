@@ -45,10 +45,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -59,8 +66,12 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.harmony.core.components.RoundedAvatar
-import com.example.harmony.core.theme.Color
+import com.example.harmony.core.components.RoundedButton
+import com.example.harmony.core.components.RoundedButton
+import androidx.compose.ui.graphics.Color
 import com.example.harmony.domain.model.Message
+import com.example.harmony.presentation.main.my_profile.MyProfile
+import com.example.harmony.presentation.main.other_profile.OtherUserProfile
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -88,7 +99,18 @@ fun ChatScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("# ${state.channelName}") },
+                title = { Text(state.channelName) },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {},
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Menu",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                },
 
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -209,6 +231,9 @@ fun MessageItem(message: Message, currentUserId: String) {
     } ?: ""
     val context = LocalContext.current
 
+    var otherUserProfileSheetState by remember { mutableStateOf(false) }
+    var myUserProfileSheetState by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = horizontalArrangement, // Align Row content
@@ -216,12 +241,17 @@ fun MessageItem(message: Message, currentUserId: String) {
     ) {
         // Show avatar only for other users
         if (!isCurrentUser) {
-            RoundedAvatar(
-                avatarImageUrl = message.senderPhotoUrl ?: "",
-                char = message.senderDisplayName.firstOrNull()?.uppercaseChar() ?: '?',
+            RoundedButton(
+                onClick = { otherUserProfileSheetState = true },
+                modifier = Modifier.padding(end = 8.dp),
                 size = 32.dp,
-                modifier = Modifier.padding(end = 8.dp).align(Alignment.Top) // Align avatar to top
-            )
+            ) {
+                RoundedAvatar(
+                    avatarImageUrl = message.senderPhotoUrl ?: "",
+                    char = message.senderDisplayName.firstOrNull()?.uppercaseChar() ?: '?',
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
 
         // Message bubble
@@ -279,15 +309,42 @@ fun MessageItem(message: Message, currentUserId: String) {
             )
         }
 
-        // Show current user avatar on the right
-        if (isCurrentUser) {
-            RoundedAvatar(
-                avatarImageUrl = message.senderPhotoUrl ?: "",
-                char = message.senderDisplayName.firstOrNull()?.uppercaseChar() ?: '?',
-                size = 32.dp,
-                modifier = Modifier.padding(start = 8.dp).align(Alignment.Top) // Align avatar to top
-            )
+            if (isCurrentUser) {
+                Spacer(modifier = Modifier.width(8.dp)) // Add space between bubble and avatar
+                RoundedButton(
+                    onClick = { myUserProfileSheetState = true },
+                    modifier = Modifier.padding(end = 8.dp),
+                    size = 32.dp,
+                ) {
+                    RoundedAvatar(
+                        avatarImageUrl = message.senderPhotoUrl ?: "",
+                        char = message.senderDisplayName.firstOrNull()?.uppercaseChar() ?: '?',
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
         }
+    }
+
+    if (otherUserProfileSheetState) {
+        OtherUserProfile(
+            displayedName = message.senderDisplayName,
+            username = message.senderDisplayName,
+            avatarUrl = message.senderPhotoUrl ?: "",
+            onDismissRequest = { otherUserProfileSheetState = false },
+            modifier = Modifier
+        )
+    }
+
+    if (myUserProfileSheetState) {
+        MyProfile (
+            displayedName = message.senderDisplayName,
+            username = message.senderDisplayName,
+            avatarUrl = message.senderPhotoUrl ?: "",
+            onDismissRequest = { myUserProfileSheetState = false },
+            modifier = Modifier,
+            hasSettings = false
+        )
     }
 }
 

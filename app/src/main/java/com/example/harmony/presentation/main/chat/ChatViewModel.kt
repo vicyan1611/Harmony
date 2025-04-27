@@ -9,6 +9,7 @@ import com.example.harmony.domain.model.Message
 import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.MessageRepository
 import com.example.harmony.domain.use_case.chat.SendChatMessageUseCase
+import com.example.harmony.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +24,8 @@ class ChatViewModel @Inject constructor(
     private val sendChatMessageUseCase: SendChatMessageUseCase,
     private val messageRepository: MessageRepository,
     private val authRepository: AuthRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatState())
     val state: StateFlow<ChatState> = _state
@@ -43,8 +45,31 @@ class ChatViewModel @Inject constructor(
 
     private fun loadCurrentUser() {
         viewModelScope.launch {
-            val user = authRepository.getCurrentUser()
-            _state.update { it.copy(currentUser = user) }
+            val user = authRepository.getCurrentUser() ?: return@launch
+            userRepository.getCollectionUser(user.id).collect { res ->
+                when (res) {
+                    is Resource.Loading -> {
+                        _state.update { it.copy(isLoading = true, error = null) }
+                    }
+                    is Resource.Success -> {
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                currentUser = res.data,
+                                error = null
+                            )
+                        }
+                    }
+                    is Resource.Error -> {
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                error = res.message
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
