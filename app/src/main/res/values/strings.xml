@@ -58,4 +58,5 @@
     <string name="add_channel_sheet_name_label">Channel Name</string>
     <string name="add_channel_sheet_description_label">Channel Description (Optional)</string>
     <string name="add_channel_sheet_create_button">Create Channel</string>
+    <string name="default_web_client_id">240255199880-gii8p0u4su17l9fgqhvqp46o2u9ckda2.apps.googleusercontent.com</string>
 </resources>
