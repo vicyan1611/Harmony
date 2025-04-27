@@ -80,13 +80,13 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             HarmonyTextField(
-                value = state.username,
-                onValueChange = { viewModel.onEvent(RegisterEvent.OnUsernameChange(it)) },
-                label = "Username",
+                value = state.displayName,
+                onValueChange = { viewModel.onEvent(RegisterEvent.OnDisplayNameChange(it)) },
+                label = "Display Name",
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Person,
-                        contentDescription = "Username"
+                        contentDescription = "Display Name"
                     )
                 },
                 keyboardType = KeyboardType.Text,
