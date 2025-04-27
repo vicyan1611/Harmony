@@ -53,9 +53,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -67,8 +64,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.harmony.core.components.RoundedAvatar
 import com.example.harmony.core.components.RoundedButton
-import com.example.harmony.core.components.RoundedButton
-import androidx.compose.ui.graphics.Color
+import com.example.harmony.core.theme.Color
 import com.example.harmony.domain.model.Message
 import com.example.harmony.presentation.main.my_profile.MyProfile
 import com.example.harmony.presentation.main.other_profile.OtherUserProfile
@@ -122,11 +118,12 @@ fun ChatScreen(
             Column {
 
                 if (state.selectedImageUri != null) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp) // Adjust height as needed
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-                        .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp) // Adjust height as needed
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                            .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
                     ) {
                         AsyncImage(
                             model = ImageRequest.Builder(context)
@@ -134,7 +131,9 @@ fun ChatScreen(
                                 .crossfade(true) // Optional
                                 .build(),
                             contentDescription = "Selected image preview",
-                            modifier = Modifier.fillMaxHeight().clip(RoundedCornerShape(8.dp)),
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(8.dp)),
                             contentScale = ContentScale.Fit
                         )
                         // Clear Button
@@ -144,15 +143,24 @@ fun ChatScreen(
                                 .align(Alignment.TopEnd)
                                 .padding(4.dp)
                                 .size(24.dp)
-                                .background(MaterialTheme.colorScheme.scrim.copy(alpha=0.5f), CircleShape)
+                                .background(
+                                    MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f),
+                                    CircleShape
+                                )
 
                         ) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear selected image", tint = MaterialTheme.colorScheme.onPrimary)
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Clear selected image",
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                         // Show loading indicator during upload if needed
                         if (state.isSending && state.selectedImageUri != null) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp).align(Alignment.Center),
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .align(Alignment.Center),
                                 strokeWidth = 2.dp
                             )
                         }
@@ -171,7 +179,10 @@ fun ChatScreen(
                         text = state.error ?: "Failed to send",
                         color = MaterialTheme.colorScheme.error,
                         fontSize = 12.sp,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp).background(MaterialTheme.colorScheme.errorContainer)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                            .background(MaterialTheme.colorScheme.errorContainer)
                     )
                 }
             }
@@ -196,10 +207,12 @@ fun ChatScreen(
                 }
             } else if (state.messages.isEmpty() && !state.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No messages yet. Start the conversation!", modifier = Modifier.padding(16.dp))
+                    Text(
+                        "No messages yet. Start the conversation!",
+                        modifier = Modifier.padding(16.dp)
+                    )
                 }
-            }
-            else {
+            } else {
                 LazyColumn(
                     state = lazyListState,
                     modifier = Modifier
@@ -223,7 +236,7 @@ fun MessageItem(message: Message, currentUserId: String) {
     val isCurrentUser = message.senderId == currentUserId
     val alignment = if (isCurrentUser) Alignment.CenterEnd else Alignment.CenterStart
     val horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
-    val bubbleColor = if (isCurrentUser) Color.MessageBubbleMe else Color.MessageBubbleOther // Use your theme colors
+    val bubbleColor = if (isCurrentUser) Color.MessageBubbleMe else Color.MessageBubbleOther
     val textColor = MaterialTheme.colorScheme.onSurface // Adjust as needed
 
     val timestampFormatted = message.timestamp?.toDate()?.let {
@@ -305,26 +318,28 @@ fun MessageItem(message: Message, currentUserId: String) {
                 text = timestampFormatted,
                 fontSize = 10.sp,
                 color = textColor.copy(alpha = 0.7f),
-                modifier = Modifier.padding(top = 4.dp).align(Alignment.End) // Align timestamp
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .align(Alignment.End) // Align timestamp
             )
         }
 
-            if (isCurrentUser) {
-                Spacer(modifier = Modifier.width(8.dp)) // Add space between bubble and avatar
-                RoundedButton(
-                    onClick = { myUserProfileSheetState = true },
-                    modifier = Modifier.padding(end = 8.dp),
-                    size = 32.dp,
-                ) {
-                    RoundedAvatar(
-                        avatarImageUrl = message.senderPhotoUrl ?: "",
-                        char = message.senderDisplayName.firstOrNull()?.uppercaseChar() ?: '?',
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+        if (isCurrentUser) {
+            Spacer(modifier = Modifier.width(8.dp)) // Add space between bubble and avatar
+            RoundedButton(
+                onClick = { myUserProfileSheetState = true },
+                modifier = Modifier.padding(end = 8.dp),
+                size = 32.dp,
+            ) {
+                RoundedAvatar(
+                    avatarImageUrl = message.senderPhotoUrl ?: "",
+                    char = message.senderDisplayName.firstOrNull()?.uppercaseChar() ?: '?',
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }
+
 
     if (otherUserProfileSheetState) {
         OtherUserProfile(
@@ -337,7 +352,7 @@ fun MessageItem(message: Message, currentUserId: String) {
     }
 
     if (myUserProfileSheetState) {
-        MyProfile (
+        MyProfile(
             displayedName = message.senderDisplayName,
             username = message.senderDisplayName,
             avatarUrl = message.senderPhotoUrl ?: "",
