@@ -10,4 +10,5 @@ interface AuthRepository {
     fun logout(): Flow<Resource<Unit>>
     fun getCurrentUser(): User?
     fun isUserAuthenticated(): Boolean
+    fun signInWithGoogle(idToken: String): Flow<Resource<User>>
 }
