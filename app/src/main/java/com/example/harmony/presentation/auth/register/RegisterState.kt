@@ -1,7 +1,7 @@
 package com.example.harmony.presentation.auth.register
 
 data class RegisterState(
-    val username: String = "",
+    val displayName: String = "",
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "",

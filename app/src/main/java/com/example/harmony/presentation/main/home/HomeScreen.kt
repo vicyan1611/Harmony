@@ -26,10 +26,14 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun HomeScreen(
     onNavigateToLogin: () -> Unit,
+    onNavigateToChat: (serverId: String, channelId: String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val isLoggingOut by viewModel.isLoggingOut.collectAsState()
+
+    val testServerId = "sv9uRm3qWJBS3i1VKI64"
+    val testChannelId = "9CJioeud3WmA2QCkwcoj"
 
     LaunchedEffect(key1 = Unit) {
         viewModel.navigationEvent.collectLatest { route ->
@@ -65,7 +69,7 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Logged in as: ${state.user?.username ?: "Unknown"}",
+                        text = "Logged in as: ${state.user?.displayName ?: "Unknown"}",
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -73,6 +77,18 @@ fun HomeScreen(
                         text = "(Email: ${state.user?.email ?: "N/A"})",
                         style = MaterialTheme.typography.bodyMedium
                     )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    HarmonyButton(
+                        text = "Test Chat Channel",
+                        onClick = {
+                            // Use the hardcoded IDs to navigate
+                            onNavigateToChat(testServerId, testChannelId)
+                        },
+                        isLoading = false // Not tied to logout state
+                    )
+
                     Spacer(modifier = Modifier.height(32.dp))
 
                     HarmonyButton(
@@ -81,6 +97,7 @@ fun HomeScreen(
                         isLoading = isLoggingOut,
                         enabled = !isLoggingOut
                     )
+
                 }
             }
         }
