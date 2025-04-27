@@ -8,6 +8,7 @@ object NavRoutes {
 
     // Main Routes
     const val HOME = "home"
+    const val CREATE_SERVER = "create_server/"
     const val SERVER_DETAIL = "server_detail/{serverId}"
     const val CHANNEL_DETAIL = "channel_detail/{channelId}"
     const val PROFILE = "profile"

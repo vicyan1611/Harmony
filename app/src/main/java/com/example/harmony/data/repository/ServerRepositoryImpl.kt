@@ -3,6 +3,7 @@ package com.example.harmony.data.repository
 import android.net.Uri
 import com.example.harmony.core.common.Constants
 import com.example.harmony.core.common.Resource
+import com.example.harmony.domain.model.Channel
 import com.example.harmony.domain.model.Server
 import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.ServerRepository
@@ -25,11 +26,16 @@ class ServerRepositoryImpl @Inject constructor (
     companion object {
         const val SERVER_HOST_USER_ID_FIELD = "ownerId"
         const val SERVER_PROFILE_URL_FIELD = "profileUrl"
-        const val SERVER_CHANNELS_LIST_FIELD =  "channels"
         const val SERVER_MEMBERS_LIST_FIELD = "members"
         const val SERVER_ID_FIELD = "id"
         const val SERVER_NAME_FIELD = "name"
         const val MAX_N_SERVER_PER_USER = 20
+
+//        const val CHANNEL_DESCRIPTION_FIELD = "description"
+//        const val CHANNEL_ID_FIELD = "id"
+//        const val CHANNEL_NAME_FIELD = "name"
+//        const val CHANNEL_SERVER_ID_FIELD = "server"
+//        const val CHANNEL_MESSAGES_LIST_FIELD =  "messages"
     }
     override fun createServer(
         name: String,
@@ -60,7 +66,7 @@ class ServerRepositoryImpl @Inject constructor (
                 SERVER_NAME_FIELD to name,
                 SERVER_ID_FIELD to serverId,
                 SERVER_PROFILE_URL_FIELD to profilePicture,
-                SERVER_CHANNELS_LIST_FIELD to emptyList<DocumentReference>(),
+                // SERVER_CHANNELS_LIST_FIELD to emptyList<DocumentReference>(),
                 SERVER_MEMBERS_LIST_FIELD to emptyList<DocumentReference>()
             )
 
@@ -71,8 +77,10 @@ class ServerRepositoryImpl @Inject constructor (
             val createdServer = Server( // Create Server object from actual data
                 id = serverId,
                 name = name,
-                hostUserId = hostUserId, // Ensure this matches your Server data class field name
-                profilePicture = profilePicture // Ensure this matches your Server data class field name
+                ownerId = hostUserId, // Ensure this matches your Server data class field name
+                profileUrl = profilePicture, // Ensure this matches your Server data class field name
+                // channels = emptyList(), // Ensure this matches your Server data class field name
+                memberIds = emptyList() // Ensure this matches your Server data class field name
             )
             emit(Resource.Success<Server>(createdServer))
 
@@ -91,7 +99,7 @@ class ServerRepositoryImpl @Inject constructor (
         emit(Resource.Error<Long>(exception.localizedMessage ?: "Failed to count servers"))
     }
 
-    override fun getServer(serverId: String): Flow<Resource<Server>> = flow {
+    override fun getServerById(serverId: String): Flow<Resource<Server>> = flow {
         try {
             val documentSnapshot = firestore.collection(Constants.SERVERS_COLLECTION)
                 .document(serverId)
@@ -108,52 +116,52 @@ class ServerRepositoryImpl @Inject constructor (
         }
     }
 
-    override fun getServerListByUser(): Flow<Resource<List<Server>>> = flow {
-        // override fun getServerListByUser(): Flow<Resource<ArrayList<Server>>> = flow { // If ArrayList is strictly needed
-        emit(Resource.Loading())
-
-        // Get current user ID (requires AuthRepository)
-        val currentUserId = authRepository.getCurrentUser()?.id // Assuming this method exists
-
-        if (currentUserId == null) {
-            emit(Resource.Error("User not logged in."))
-            return@flow
-        }
-
-        // Construct DocumentReference for the current user
-        val currentUserRef = firestore.collection(Constants.USERS_COLLECTION).document(currentUserId)
-
-        val (memberServers, hostedServers) = coroutineScope {
-            val memberQuery = firestore.collection(Constants.SERVERS_COLLECTION)
-                .whereArrayContains(SERVER_MEMBERS_LIST_FIELD, currentUserRef)
-                .get()
-            val hostQuery = firestore.collection(Constants.SERVERS_COLLECTION)
-                .whereEqualTo(SERVER_HOST_USER_ID_FIELD, currentUserId)
-                .get()
-            val memberSnapshot = async { memberQuery.await() }
-            val hostSnapshot = async { hostQuery.await() }
-
-            Pair(memberSnapshot.await(), hostSnapshot.await())
-        }
-
-        val combinedServers = mutableMapOf<String, Server>()
-        memberServers.documents.forEach { document ->
-            val server = document.toObject(Server::class.java) //?.copy(id = document.id) // Adjust if ID needs manual setting
-            if (server != null) {
-                combinedServers[document.id] = server // Add/overwrite in map
-            }
-        }
-
-        hostedServers.documents.forEach { document ->
-            val server = document.toObject(Server::class.java) //?.copy(id = document.id) // Adjust if ID needs manual setting
-            if (server != null) {
-                combinedServers[document.id] = server // Add/overwrite in map (handles duplicates)
-            }
-        }
-
-        // Emit success with the list
-        emit(Resource.Success(combinedServers.values.toList()))
-    }.catch { exception ->
-        emit(Resource.Error(exception.localizedMessage ?: "Failed to fetch server list"))
-    }
+//    override fun getServerListByUser(): Flow<Resource<List<Server>>> = flow {
+//        // override fun getServerListByUser(): Flow<Resource<ArrayList<Server>>> = flow { // If ArrayList is strictly needed
+//        emit(Resource.Loading())
+//
+//        // Get current user ID (requires AuthRepository)
+//        val currentUserId = authRepository.getCurrentUser()?.id // Assuming this method exists
+//
+//        if (currentUserId == null) {
+//            emit(Resource.Error("User not logged in."))
+//            return@flow
+//        }
+//
+//        // Construct DocumentReference for the current user
+//        val currentUserRef = firestore.collection(Constants.USERS_COLLECTION).document(currentUserId)
+//
+//        val (memberServers, hostedServers) = coroutineScope {
+//            val memberQuery = firestore.collection(Constants.SERVERS_COLLECTION)
+//                .whereArrayContains(SERVER_MEMBERS_LIST_FIELD, currentUserRef)
+//                .get()
+//            val hostQuery = firestore.collection(Constants.SERVERS_COLLECTION)
+//                .whereEqualTo(SERVER_HOST_USER_ID_FIELD, currentUserId)
+//                .get()
+//            val memberSnapshot = async { memberQuery.await() }
+//            val hostSnapshot = async { hostQuery.await() }
+//
+//            Pair(memberSnapshot.await(), hostSnapshot.await())
+//        }
+//
+//        val combinedServers = mutableMapOf<String, Server>()
+//        memberServers.documents.forEach { document ->
+//            val server = document.toObject(Server::class.java) //?.copy(id = document.id) // Adjust if ID needs manual setting
+//            if (server != null) {
+//                combinedServers[document.id] = server // Add/overwrite in map
+//            }
+//        }
+//
+//        hostedServers.documents.forEach { document ->
+//            val server = document.toObject(Server::class.java) //?.copy(id = document.id) // Adjust if ID needs manual setting
+//            if (server != null) {
+//                combinedServers[document.id] = server // Add/overwrite in map (handles duplicates)
+//            }
+//        }
+//
+//        // Emit success with the list
+//        emit(Resource.Success(combinedServers.values.toList()))
+//    }.catch { exception ->
+//        emit(Resource.Error(exception.localizedMessage ?: "Failed to fetch server list"))
+//    }
 }

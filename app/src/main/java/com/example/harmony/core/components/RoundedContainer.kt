@@ -19,7 +19,7 @@ fun RoundedContainer(modifier: Modifier = Modifier, size: Dp = 80.dp, content: @
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.secondary),
+            .background(MaterialTheme.colorScheme.primary),
         contentAlignment = Alignment.Center,
         content = content
     )
