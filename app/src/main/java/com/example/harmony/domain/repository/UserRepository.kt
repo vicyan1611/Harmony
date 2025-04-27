@@ -13,4 +13,5 @@ interface UserRepository {
 
     fun searchUsers(query: String): Flow<Resource<List<User>>>
 
+    fun removeServerFromAllUsers(serverId: String): Flow<Resource<Unit>>
 }

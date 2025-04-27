@@ -17,4 +17,5 @@ sealed class HomeEvent {
     object OnShowMyProfileSheet : HomeEvent()
     object OnDismissMyProfileSheet : HomeEvent()
     object OnNavigateToSettings : HomeEvent()
+    object OnNavigateToConfigServer: HomeEvent()
 }

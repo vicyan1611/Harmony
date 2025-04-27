@@ -30,6 +30,8 @@ import com.example.harmony.core.components.RoundedAvatar
 import com.example.harmony.core.components.RoundedButton
 import com.example.harmony.domain.model.Channel
 import com.example.harmony.domain.model.User
+import com.example.harmony.presentation.main.home.HomeEvent
+import com.example.harmony.presentation.main.home.HomeViewModel
 
 @Composable
 fun ChannelList(
@@ -41,7 +43,8 @@ fun ChannelList(
     onUserSettingsClick: () -> Unit, // TODO: Implement later
     modifier: Modifier = Modifier,
     isHost: Boolean = true,
-    onAvatarClick: () -> Unit
+    onAvatarClick: () -> Unit,
+    viewModel: HomeViewModel
 ) {
     val listBgColor = MaterialTheme.colorScheme.surface // Slightly lighter than server list
     Column(
@@ -67,6 +70,20 @@ fun ChannelList(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                if (isHost) {
+                    IconButton(
+                        onClick = { viewModel.onEvent(HomeEvent.OnNavigateToConfigServer) },
+                        // horizontally end
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
             }
         } else {
             // You could show a "Direct Messages" header here if needed

@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.material.ExperimentalMaterialApi // Still needed for PullRefresh
 
 import androidx.compose.material3.SheetValue
+import androidx.navigation.NavBackStackEntry
 
 import com.example.harmony.presentation.main.my_profile.MyProfile
 import kotlinx.coroutines.launch
@@ -43,7 +44,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    onNavigateToJoinServer: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoggingOut by viewModel.isLoggingOut.collectAsStateWithLifecycle()
@@ -91,38 +93,56 @@ fun HomeScreen(
         }
     }
 
+    // --- Get NavBackStackEntry ---
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    // --- LaunchedEffect for Navigation ---
-    LaunchedEffect(key1 = Unit) {
-        viewModel.navigationEvent.collectLatest { route ->
-            when (route) {
-                NavRoutes.LOGIN -> {
-                    navController.navigate(NavRoutes.LOGIN) {
-                        popUpTo(NavRoutes.HOME) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
-                NavRoutes.CREATE_SERVER -> {
-                    navController.navigate(NavRoutes.CREATE_SERVER)
-                }
-                // --- Add Navigation for Settings ---
-                NavRoutes.SETTINGS -> {
-                    // Make sure NavRoutes.SETTINGS is defined
-                    // and you have a composable for it in NavGraph.kt
-                    navController.navigate(NavRoutes.SETTINGS)
-                }
-            }
+    // --- LaunchedEffect for Reloading after CreateServerScreen ---
+    val serverCreatedResult = navBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("server_created")?.observeAsState()
+    LaunchedEffect(serverCreatedResult?.value) {
+        if (serverCreatedResult?.value == true) {
+            viewModel.refreshData() // Call existing refresh
+            navBackStackEntry?.savedStateHandle?.remove<Boolean>("server_created") // Use remove instead of set to false
         }
     }
 
-    // --- LaunchedEffect for Reloading after CreateServerScreen ---
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val serverCreatedResult = navBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("server_created")?.observeAsState()
+    // --- NEW: LaunchedEffect for Reloading after ConfigServerScreen ---
+    val serverUpdatedResult = navBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("server_list_updated")?.observeAsState()
+    LaunchedEffect(serverUpdatedResult?.value) {
+        if (serverUpdatedResult?.value == true) {
+            viewModel.refreshData() // Call existing refresh
+            navBackStackEntry?.savedStateHandle?.remove<Boolean>("server_list_updated") // Clear the result
+        }
+    }
 
-    LaunchedEffect(serverCreatedResult?.value) {
-        if (serverCreatedResult?.value == true) {
-            viewModel.refreshData()
-            navBackStackEntry?.savedStateHandle?.set("server_created", false)
+    // --- LaunchedEffect for Navigation (Handling NavigationCommand) ---
+    LaunchedEffect(key1 = Unit) {
+        viewModel.navigationEvent.collectLatest { command ->
+            when (command) {
+                is NavigationCommand.NavigateTo -> {
+                    // Handle standard navigation
+                    if (command.route == NavRoutes.LOGIN) { // Specific handling for logout
+                        navController.navigate(command.route) {
+                            popUpTo(NavRoutes.HOME) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    } else {
+                        // General navigation for other routes (CreateServer, Settings, ConfigServer etc.)
+                        navController.navigate(command.route)
+                    }
+                }
+                is NavigationCommand.NavigateBack -> {
+                    navController.popBackStack()
+                }
+                is NavigationCommand.NavigateBackWithResult -> {
+                    // Set result on previous entry and pop back stack
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        command.result.first,
+                        command.result.second
+                    )
+                    navController.popBackStack()
+                }
+                // Add other command types if needed
+            }
         }
     }
 
@@ -145,7 +165,8 @@ fun HomeScreen(
                     onAddServerClick = { viewModel.onEvent(HomeEvent.OnAddServerClicked) },
                     onDmButtonClick = { navController.navigate(NavRoutes.DM_LIST) },
                     isLoading = state.isLoadingServers && !state.isRefreshing,
-                    modifier = Modifier.fillMaxHeight()
+                    modifier = Modifier.fillMaxHeight(),
+                    onJoinServerClick = onNavigateToJoinServer
                 )
 
                 ChannelList(
@@ -167,7 +188,8 @@ fun HomeScreen(
                         .fillMaxHeight()
                         .weight(0.3f),
                     isHost = state.selectedServer?.server?.ownerId != null && state.user?.id != null && state.selectedServer?.server?.ownerId == state.user?.id,
-                    onAvatarClick = { viewModel.onEvent(HomeEvent.OnShowMyProfileSheet) }
+                    onAvatarClick = { viewModel.onEvent(HomeEvent.OnShowMyProfileSheet) },
+                    viewModel = viewModel
                 )
             }
 

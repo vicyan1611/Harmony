@@ -17,6 +17,12 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class NavigationCommand {
+    data class NavigateTo(val route: String) : NavigationCommand()
+    data class NavigateBackWithResult(val result: Pair<String, Any>) : NavigationCommand()
+    object NavigateBack : NavigationCommand()
+}
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
@@ -28,8 +34,8 @@ class HomeViewModel @Inject constructor(
     private val _state = MutableStateFlow(HomeState(isRefreshing = false))
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
-    private val _navigationEvent = MutableSharedFlow<String>()
-    val navigationEvent: SharedFlow<String> = _navigationEvent.asSharedFlow()
+    private val _navigationEvent = MutableSharedFlow<NavigationCommand>()
+    val navigationEvent: SharedFlow<NavigationCommand> = _navigationEvent.asSharedFlow()
 
     private val _isLoggingOut = MutableStateFlow(false)
     val isLoggingOut: StateFlow<Boolean> = _isLoggingOut.asStateFlow()
@@ -54,7 +60,7 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.OnAddServerClicked -> {
                 viewModelScope.launch {
                     // Navigate to the Create Server screen
-                    _navigationEvent.emit(NavRoutes.CREATE_SERVER)
+                    _navigationEvent.emit(NavigationCommand.NavigateTo(NavRoutes.CREATE_SERVER))
                 }
             }
             is HomeEvent.OnLogoutClicked -> {
@@ -113,7 +119,21 @@ class HomeViewModel @Inject constructor(
                 _state.update { it.copy(isMyProfileSheetVisible = false) }
                 viewModelScope.launch {
                     // You'll need to add NavRoutes.SETTINGS
-                    _navigationEvent.emit(NavRoutes.SETTINGS)
+                    _navigationEvent.emit(NavigationCommand.NavigateTo(NavRoutes.SETTINGS))
+                }
+            }
+            HomeEvent.OnNavigateToConfigServer -> {
+                val serverId = state.value.selectedServer?.server?.id // Get the ID
+                if (serverId != null) {
+                    viewModelScope.launch {
+                        // Use the new helper function to build the route
+                        _navigationEvent.emit(NavigationCommand.NavigateTo(NavRoutes.getConfigServerRoute(serverId)))
+                    }
+                } else {
+                    // Handle error: No server selected
+                    viewModelScope.launch {
+                        _state.update { it.copy(serversLoadError = "Please select a server first.") }
+                    }
                 }
             }
         }
@@ -246,7 +266,7 @@ class HomeViewModel @Inject constructor(
                 }
                 is Resource.Success -> {
                     _isLoggingOut.update { false }
-                    _navigationEvent.emit(NavRoutes.LOGIN)
+                    _navigationEvent.emit(NavigationCommand.NavigateTo(NavRoutes.LOGIN))
                 }
                 is Resource.Error -> {
                     _isLoggingOut.update { false }
