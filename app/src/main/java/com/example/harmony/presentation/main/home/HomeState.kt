@@ -15,5 +15,11 @@ data class HomeState(
     val serversLoadError: String? = null,
     val serversWithChannels: List<ServerWithChannels> = emptyList(),
     val selectedServer: ServerWithChannels? = null,
-    val isRefreshing: Boolean = false
+    val isRefreshing: Boolean = false,
+
+    val isAddChannelSheetVisible: Boolean = false,
+    val newChannelName: String = "",
+    val newChannelDescription: String = "",
+    val isCreatingChannel: Boolean = false,
+    val createChannelError: String? = null
 )

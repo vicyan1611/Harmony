@@ -7,4 +7,10 @@ sealed class HomeEvent {
     object OnAddServerClicked : HomeEvent()
     object OnLogoutClicked : HomeEvent()
     object OnRefresh : HomeEvent()
+
+    object OnShowAddChannelSheet : HomeEvent() // Event to show the sheet
+    object OnDismissAddChannelSheet : HomeEvent() // Event to hide the sheet
+    data class OnNewChannelNameChange(val name: String) : HomeEvent()
+    data class OnNewChannelDescriptionChange(val description: String) : HomeEvent()
+    object OnCreateChannelClicked : HomeEvent()
 }

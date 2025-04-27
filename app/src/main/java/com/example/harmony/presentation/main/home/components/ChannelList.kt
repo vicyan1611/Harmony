@@ -76,19 +76,21 @@ fun ChannelList(
                 .padding(horizontal = 8.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            // Optional: Add a category header like "Text Channels"
             item {
-                ChannelCategoryHeader(name = stringResource(R.string.channel_list_display_title_textchannel), onAddChannelClick)
+                ChannelCategoryHeader(
+                    name = stringResource(R.string.channel_list_display_title_textchannel),
+                    // Pass the lambda here
+                    onAddClick = onAddChannelClick
+                )
             }
 
             items(channels, key = { it.id }) { channel ->
                 ChannelItem(
                     channel = channel,
-                    isSelected = false, // TODO: Add channel selection state later
+                    isSelected = false,
                     onClick = { onChannelClick(channel) }
                 )
             }
-            // TODO: Add Voice Channels section later
         }
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -167,7 +169,6 @@ private fun ChannelItem(
         // Optional: Add icons for unread messages, mentions, etc. here
     }
 }
-
 
 @Composable
 fun UserPanel(

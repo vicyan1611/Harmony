@@ -3,8 +3,10 @@ package com.example.harmony.presentation.main.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.harmony.core.common.Constants
 import com.example.harmony.core.common.Resource
 import com.example.harmony.domain.repository.AuthRepository
+import com.example.harmony.domain.repository.ChannelRepository
 import com.example.harmony.domain.use_case.LogoutUseCase
 // Import the new use case
 import com.example.harmony.domain.use_case.server.GetServersAndChannelsByUserIdUseCase
@@ -18,7 +20,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val logoutUseCase: LogoutUseCase,
-    private val getServersAndChannelsByUserIdUseCase: GetServersAndChannelsByUserIdUseCase
+    private val getServersAndChannelsByUserIdUseCase: GetServersAndChannelsByUserIdUseCase,
+    private val channelRepository: ChannelRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(HomeState(isRefreshing = false))
     val state: StateFlow<HomeState> = _state.asStateFlow()
@@ -59,11 +62,40 @@ class HomeViewModel @Inject constructor(
             HomeEvent.OnRefresh -> {
                 viewModelScope.launch {
                     _state.update { it.copy(isRefreshing = true) }
-                    // Add a small delay for visual feedback (optional)
-                    // delay(500)
                     loadServersAndChannels() // Reload data
-                    // isRefreshing will be set to false inside loadServersAndChannels's success/error
                 }
+            }
+            HomeEvent.OnShowAddChannelSheet -> {
+                // Only show if a server is selected
+                if (state.value.selectedServer != null) {
+                    _state.update {
+                        it.copy(
+                            isAddChannelSheetVisible = true,
+                            // Reset fields when showing
+                            newChannelName = "",
+                            newChannelDescription = "",
+                            createChannelError = null,
+                            isCreatingChannel = false
+                        )
+                    }
+                }
+                // Optionally, show a toast or message if no server is selected
+            }
+            HomeEvent.OnDismissAddChannelSheet -> {
+                _state.update { it.copy(isAddChannelSheetVisible = false) }
+            }
+            is HomeEvent.OnNewChannelNameChange -> {
+                if (event.name.length <= 50) { // Enforce max length
+                    _state.update { it.copy(newChannelName = event.name) }
+                }
+            }
+            is HomeEvent.OnNewChannelDescriptionChange -> {
+                if (event.description.length <= 200) { // Enforce max length
+                    _state.update { it.copy(newChannelDescription = event.description) }
+                }
+            }
+            HomeEvent.OnCreateChannelClicked -> {
+                createChannel()
             }
         }
     }
@@ -131,6 +163,48 @@ class HomeViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    private fun createChannel() {
+        val name = state.value.newChannelName.trim()
+        val description = state.value.newChannelDescription.trim()
+        val serverId = state.value.selectedServer?.server?.id
+
+        if (name.isBlank()) {
+            _state.update { it.copy(createChannelError = "Channel name cannot be empty") }
+            return
+        }
+        if (serverId == null) {
+            _state.update { it.copy(createChannelError = "No server selected") }
+            return
+        }
+
+        channelRepository.createChannel(name = name, description = description, serverId = serverId)
+            .onEach { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        _state.update { it.copy(isCreatingChannel = true, createChannelError = null) }
+                    }
+                    is Resource.Success -> {
+                        _state.update {
+                            it.copy(
+                                isCreatingChannel = false,
+                                isAddChannelSheetVisible = false, // Close sheet on success
+                                createChannelError = null
+                            )
+                        }
+                        refreshData() // Reload server/channel list
+                    }
+                    is Resource.Error -> {
+                        _state.update {
+                            it.copy(
+                                isCreatingChannel = false,
+                                createChannelError = result.message ?: Constants.ERROR_SOMETHING_WENT_WRONG // Show error
+                            )
+                            // Don't close the sheet on error
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
+    }
 
     private fun logout() { // Renamed from original HomeViewModel's logout
         logoutUseCase().onEach { result ->
