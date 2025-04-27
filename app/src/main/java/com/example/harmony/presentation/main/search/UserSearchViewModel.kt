@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 sealed class UserSearchNavigationEvent {
     data class NavigateToDmChat(val conversationId: String) : UserSearchNavigationEvent()
 }
