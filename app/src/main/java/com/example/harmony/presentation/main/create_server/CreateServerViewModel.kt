@@ -19,7 +19,9 @@ import javax.inject.Inject
 // Define commands for clarity
 sealed class NavigationCommand {
     data class NavigateTo(val route: String) : NavigationCommand()
-    object NavigateBack : NavigationCommand() // Command to exit the flow
+    // --- Modify NavigateBack ---
+    data class NavigateBackWithResult(val result: Pair<String, Any>) : NavigationCommand()
+    object NavigateBack : NavigationCommand() // Keep simple back navigation if needed elsewhere
 }
 
 @HiltViewModel
@@ -46,7 +48,7 @@ class CreateServerViewModel @Inject constructor (val createServerUseCase: Create
 
             is CreateServerEvent.InviteDismissed -> { // Handle dismiss
                 viewModelScope.launch {
-                    _navigationEvent.emit(NavigationCommand.NavigateBack) // Emit NavigateBack command
+                    _navigationEvent.emit(NavigationCommand.NavigateBackWithResult("server_created" to true))
                 }
             }
         }

@@ -21,5 +21,9 @@
     <string name="server_creation_invite_sharelinkButton">Chia sẻ link</string>
     <string name="server_creation_servername_label">Tên máy chủ</string>
     <string name="server_creation_createbutton">Tạo máy chủ</string>
+    <string name="add_channel_sheet_create_button">Tạo kênh</string>
     <string name="channel_list_display_title_textchannel">Kênh văn bản</string>
+    <string name="add_channel_sheet_title">Tạo kênh</string>
+    <string name="add_channel_sheet_name_label">Tên kênh</string>
+    <string name="add_channel_sheet_description_label">Mô tả kênh</string>
 </resources>

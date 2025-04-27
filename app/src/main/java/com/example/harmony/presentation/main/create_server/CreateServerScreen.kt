@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -34,10 +33,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,12 +54,9 @@ import coil3.request.ImageRequest
 import com.example.harmony.R
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
 import com.example.harmony.core.components.HarmonyButton
 import com.example.harmony.core.components.HarmonyTextField
-import com.example.harmony.core.theme.HarmonyTheme
 
 sealed class ServerCreationScreen(val route: String, val label: String) {
     object ServerName: ServerCreationScreen("server/creation/name", "Name")
@@ -363,6 +355,15 @@ fun CreateServerScreen(
                     // Use the main controller to exit the *entire* ServerCreation flow
                     mainNavController.popBackStack()
                 }
+
+                is NavigationCommand.NavigateBackWithResult -> {
+                    // Set the result on the *previous* back stack entry (HomeScreen's entry)
+                    mainNavController.previousBackStackEntry?.savedStateHandle?.set(
+                        command.result.first, // key: "server_created"
+                        command.result.second // value: true
+                    )
+                    mainNavController.popBackStack()
+                }
             }
         }
     }
@@ -382,11 +383,3 @@ fun CreateServerScreen(
         )
     }
 }
-
-//@Preview
-//@Composable
-//fun ServerCreationPreview() {
-//    HarmonyTheme {
-//        ServerCreation(rememberNavController())
-//    }
-//}

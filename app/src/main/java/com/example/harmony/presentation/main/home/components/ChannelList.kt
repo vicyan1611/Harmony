@@ -8,7 +8,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tag // For text channels
 import androidx.compose.material3.*
@@ -91,10 +93,10 @@ fun ChannelList(
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         // User Panel at the Bottom
-//        UserPanel(
-//            user = currentUser,
-//            onSettingsClick = onUserSettingsClick
-//        )
+        UserPanel(
+            user = currentUser,
+            onSettingsClick = onUserSettingsClick
+        )
     }
 }
 
@@ -205,7 +207,11 @@ fun UserPanel(
         Row {
             // TODO: Add Mic/Headset icons later if needed
             IconButton(onClick = onSettingsClick) {
-                Icon(Icons.Default.Settings, contentDescription = "User Settings")
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = "Log out",
+                    tint = Color.Red
+                )
             }
         }
     }

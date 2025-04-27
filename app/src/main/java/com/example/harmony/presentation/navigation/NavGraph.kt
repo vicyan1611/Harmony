@@ -2,12 +2,15 @@ package com.example.harmony.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.harmony.presentation.auth.login.LoginScreen
 import com.example.harmony.presentation.auth.register.RegisterScreen
 import com.example.harmony.presentation.auth.splash.SplashScreen
+import com.example.harmony.presentation.main.chat.ChatScreen
 import com.example.harmony.presentation.main.create_server.CreateServerScreen
 import com.example.harmony.presentation.main.home.HomeScreen
 
@@ -71,10 +74,21 @@ fun NavGraph(
             )
         }
 
+//        Create server
         composable(route = NavRoutes.CREATE_SERVER) {
             CreateServerScreen (
                 mainNavController = navController
             )
+        }
+
+//        Channel chat
+        composable(
+            route = NavRoutes.CHAT, arguments = listOf(
+                navArgument("serverId") { type = NavType.StringType },
+                navArgument("channelId") { type = NavType.StringType }
+            )
+        ) {
+            ChatScreen()
         }
 //
 //        composable(

@@ -41,7 +41,6 @@ fun ServerListSidebar(
     modifier: Modifier = Modifier
 ) {
     val sidebarColor = MaterialTheme.colorScheme.background // Or choose a darker color
-    Toast.makeText(LocalContext.current, servers.size.toString() ?: "Loading", Toast.LENGTH_SHORT).show()
     Column(
         modifier = modifier
             .fillMaxHeight()

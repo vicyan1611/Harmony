@@ -4,7 +4,6 @@ package com.example.harmony.presentation.main.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.harmony.core.common.Resource
-import com.example.harmony.domain.model.ServerWithChannels // Import ServerWithChannels
 import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.use_case.LogoutUseCase
 // Import the new use case
@@ -15,35 +14,32 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// Define Events for UI interactions
-sealed class HomeEvent {
-    data class OnServerSelected(val server: ServerWithChannels) : HomeEvent()
-    object OnAddServerClicked : HomeEvent()
-    object OnLogoutClicked : HomeEvent()
-    // Add other events like OnChannelSelected if needed later
-}
-
-
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val logoutUseCase: LogoutUseCase,
-    // Inject the use case
     private val getServersAndChannelsByUserIdUseCase: GetServersAndChannelsByUserIdUseCase
 ) : ViewModel() {
-    private val _state = MutableStateFlow(HomeState())
-    val state: StateFlow<HomeState> = _state
+    private val _state = MutableStateFlow(HomeState(isRefreshing = false))
+    val state: StateFlow<HomeState> = _state.asStateFlow()
 
     private val _navigationEvent = MutableSharedFlow<String>()
     val navigationEvent: SharedFlow<String> = _navigationEvent.asSharedFlow()
 
     private val _isLoggingOut = MutableStateFlow(false)
-    val isLoggingOut: StateFlow<Boolean> = _isLoggingOut
+    val isLoggingOut: StateFlow<Boolean> = _isLoggingOut.asStateFlow()
 
     init {
         loadCurrentUser()
         loadServersAndChannels() // Load servers on init
     }
+
+    // Public function to allow triggering refresh from outside (e.g., screen resume)
+    fun refreshData() {
+        loadCurrentUser() // Reload user info if necessary
+        loadServersAndChannels() // Reload server list
+    }
+
 
     fun onEvent(event: HomeEvent) {
         when (event) {
@@ -58,6 +54,16 @@ class HomeViewModel @Inject constructor(
             }
             is HomeEvent.OnLogoutClicked -> {
                 logout()
+            }
+            // Handle the refresh event
+            HomeEvent.OnRefresh -> {
+                viewModelScope.launch {
+                    _state.update { it.copy(isRefreshing = true) }
+                    // Add a small delay for visual feedback (optional)
+                    // delay(500)
+                    loadServersAndChannels() // Reload data
+                    // isRefreshing will be set to false inside loadServersAndChannels's success/error
+                }
             }
         }
     }
@@ -82,14 +88,24 @@ class HomeViewModel @Inject constructor(
     private fun loadServersAndChannels() {
         val userId = authRepository.getCurrentUser()?.id // Get current user ID
         if (userId == null) {
-            _state.update { it.copy(isLoadingServers = false, serversLoadError = "User not logged in") }
+            // Also set isRefreshing to false here
+            _state.update { it.copy(isLoadingServers = false, serversLoadError = "User not logged in", isRefreshing = false) }
             return
         }
+
+        // Don't set isLoadingServers true if only refreshing
+        if (!_state.value.isRefreshing) {
+            _state.update { it.copy(isLoadingServers = true, serversLoadError = null) }
+        }
+
 
         getServersAndChannelsByUserIdUseCase(userId).onEach { result ->
             when (result) {
                 is Resource.Loading -> {
-                    _state.update { it.copy(isLoadingServers = true, serversLoadError = null) }
+                    // Only update if not already refreshing, otherwise keep isRefreshing = true
+                    if (!_state.value.isRefreshing) {
+                        _state.update { it.copy(isLoadingServers = true, serversLoadError = null) }
+                    }
                 }
                 is Resource.Success -> {
                     val servers = result.data ?: emptyList()
@@ -97,9 +113,8 @@ class HomeViewModel @Inject constructor(
                         it.copy(
                             isLoadingServers = false,
                             serversWithChannels = servers,
-                            // Optionally select the first server by default?
-                            // selectedServer = servers.firstOrNull()
-                            selectedServer = it.selectedServer ?: servers.firstOrNull() // Keep selection if already made
+                            selectedServer = it.selectedServer ?: servers.firstOrNull(), // Keep selection if already made
+                            isRefreshing = false // <-- Stop refreshing on success
                         )
                     }
                 }
@@ -107,7 +122,8 @@ class HomeViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             isLoadingServers = false,
-                            serversLoadError = result.message ?: "Failed to load servers"
+                            serversLoadError = result.message ?: "Failed to load servers",
+                            isRefreshing = false // <-- Stop refreshing on error
                         )
                     }
                 }

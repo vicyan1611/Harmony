@@ -54,7 +54,7 @@ class CreateServerUseCase @Inject constructor(
                         userRepository.appendListJoinedServerIds(ownerId, server.id).collect {
                             send(Resource.Success(server.id))
                         }
-                        channelRepository.createChannel("general", "", server.id).collect { data ->
+                        channelRepository.createChannel("general", "", server.id).collect {
                             send(Resource.Success(server.id))
                         }
                         send(Resource.Success(inviteLink)) // Emit the constructed link
