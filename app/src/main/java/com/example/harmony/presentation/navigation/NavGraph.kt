@@ -13,7 +13,10 @@ import com.example.harmony.presentation.auth.register.RegisterScreen
 import com.example.harmony.presentation.auth.splash.SplashScreen
 import com.example.harmony.presentation.main.chat.ChatScreen
 import com.example.harmony.presentation.main.create_server.CreateServerScreen
+import com.example.harmony.presentation.main.dm.DirectMessageChatScreen
+import com.example.harmony.presentation.main.dm.DirectMessageListScreen
 import com.example.harmony.presentation.main.home.HomeScreen
+import com.example.harmony.presentation.main.search.UserSearchScreen
 
 @Composable
 fun NavGraph(
@@ -95,6 +98,37 @@ fun NavGraph(
         ) {
             ChatScreen()
         }
+
+        composable(route = NavRoutes.DM_LIST) {
+            DirectMessageListScreen(
+                onNavigateToDmChat = { conversationId ->
+                    navController.navigate(NavRoutes.getDmChatRoute(conversationId))
+                },
+                onNavigateToUserSearch = {
+                    navController.navigate(NavRoutes.USER_SEARCH)
+                }
+            )
+        }
+
+        composable(
+            route = NavRoutes.DM_CHAT,
+            arguments = listOf(navArgument("conversationId") { type = NavType.StringType })
+        ) {
+            DirectMessageChatScreen() // ViewModel gets args via SavedStateHandle
+        }
+
+        composable(route = NavRoutes.USER_SEARCH) {
+            UserSearchScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToDmChat = { conversationId ->
+                    // Navigate to DM chat, potentially clearing search from backstack
+                    navController.navigate(NavRoutes.getDmChatRoute(conversationId)) {
+                        popUpTo(NavRoutes.USER_SEARCH) { inclusive = true }
+                    }
+                }
+            )
+        }
+
 //
 //        composable(
 //            route = NavRoutes.SERVER_DETAIL,
