@@ -1,13 +1,17 @@
 package com.example.harmony.data.repository
 
+import android.util.Log
 import com.example.harmony.core.common.Constants.ERROR_SOMETHING_WENT_WRONG
 import com.example.harmony.core.common.Constants.USERS_COLLECTION
 import com.example.harmony.core.common.Resource
 import com.example.harmony.domain.model.User
 import com.example.harmony.domain.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -29,6 +33,59 @@ class AuthRepositoryImpl @Inject constructor(
             emit(Resource.Success<User>(user))
         } catch (e: Exception) {
             emit(Resource.Error<User>(e.localizedMessage ?: ERROR_SOMETHING_WENT_WRONG))
+        }
+    }
+
+    override fun signInWithGoogle(idToken: String): Flow<Resource<User>> = flow {
+        emit(Resource.Loading())
+        try {
+
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+
+            val authResult = auth.signInWithCredential(credential).await()
+            val firebaseUser = authResult.user ?: throw Exception("Firebase user is null after Google Sign-In")
+
+
+            val user = getOrCreateUserInFirestore(firebaseUser)
+
+            emit(Resource.Success(user))
+
+        } catch (e: Exception) {
+            Log.e("AuthRepositoryImpl", "Google Sign-In Error: ${e.message}", e)
+            emit(Resource.Error(e.localizedMessage ?: ERROR_SOMETHING_WENT_WRONG))
+        }
+    }
+
+    private suspend fun getOrCreateUserInFirestore(firebaseUser: FirebaseUser): User {
+        val userDocRef = firestore.collection(USERS_COLLECTION).document(firebaseUser.uid)
+        val snapshot = userDocRef.get().await()
+
+        if (snapshot.exists()) {
+            val existingUser = snapshot.toObject(User::class.java)
+
+            val updatedUser = existingUser?.copy(
+                displayName = firebaseUser.displayName ?: existingUser.displayName,
+                photoUrl = firebaseUser.photoUrl?.toString() ?: existingUser.photoUrl
+            ) ?: throw IllegalStateException("Existing user data null")
+
+
+            if (updatedUser.displayName != existingUser.displayName || updatedUser.photoUrl != existingUser.photoUrl) {
+                userDocRef.set(updatedUser, SetOptions.merge()).await()
+            }
+            return updatedUser
+
+        } else {
+
+            val newUser = User(
+                id = firebaseUser.uid,
+                displayName = firebaseUser.displayName ?: "Harmony User", // Provide a default
+                email = firebaseUser.email ?: "", // Google usually provides email
+                photoUrl = firebaseUser.photoUrl?.toString(),
+                createdAt = System.currentTimeMillis(), // Set creation time
+                updatedAt = System.currentTimeMillis()
+            )
+            userDocRef.set(newUser).await()
+            return newUser
         }
     }
 
