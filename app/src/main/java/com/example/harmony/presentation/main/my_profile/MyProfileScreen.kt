@@ -12,7 +12,9 @@ import com.example.harmony.core.components.RoundedButton
 import com.example.harmony.core.components.UserProfileLayout
 
 @Composable
-fun MyProfile(displayedName: String = "", username: String = "", bio: String = "", avatarUrl: String = "", modifier: Modifier, onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit = {}, bodyContent: @Composable RowScope.() -> Unit = {}) {
+fun MyProfile(displayedName: String = "", username: String = "", bio: String = "", avatarUrl: String = "", modifier: Modifier, onDismissRequest: () -> Unit, headerContent: @Composable RowScope.() -> Unit = {}, bodyContent: @Composable RowScope.() -> Unit = {},
+              onSettingsClick: () -> Unit
+) {
     UserProfileLayout(
         displayedName = displayedName,
         username = username,
@@ -21,18 +23,21 @@ fun MyProfile(displayedName: String = "", username: String = "", bio: String = "
         onDismissRequest = onDismissRequest,
         avatarUrl = avatarUrl,
         headerContent = {
-            bodyContent()
+            headerContent()
             RoundedButton(
+                containerColor = MaterialTheme.colorScheme.primary,
                 size = 32.dp,
-                onClick = {}
+                onClick = onSettingsClick
             ) {
                 Icon(
                     imageVector = Icons.Filled.Settings,
                     contentDescription = "",
-                    tint = MaterialTheme.colorScheme.onSecondary
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         },
-        bodyContent = {}
+        bodyContent = {
+            bodyContent()
+        }
     )
 }

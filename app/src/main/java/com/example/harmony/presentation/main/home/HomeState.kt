@@ -21,5 +21,7 @@ data class HomeState(
     val newChannelName: String = "",
     val newChannelDescription: String = "",
     val isCreatingChannel: Boolean = false,
-    val createChannelError: String? = null
+    val createChannelError: String? = null,
+
+    val isMyProfileSheetVisible: Boolean = false
 )

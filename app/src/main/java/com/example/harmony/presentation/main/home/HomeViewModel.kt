@@ -99,6 +99,23 @@ class HomeViewModel @Inject constructor(
             HomeEvent.OnCreateChannelClicked -> {
                 createChannel()
             }
+            HomeEvent.OnShowMyProfileSheet -> {
+                loadCurrentUser()
+                if (state.value.user != null) { // Only show if user data is loaded
+                    _state.update { it.copy(isMyProfileSheetVisible = true) }
+                }
+            }
+            HomeEvent.OnDismissMyProfileSheet -> {
+                _state.update { it.copy(isMyProfileSheetVisible = false) }
+            }
+            HomeEvent.OnNavigateToSettings -> {
+                // Hide sheet before navigating
+                _state.update { it.copy(isMyProfileSheetVisible = false) }
+                viewModelScope.launch {
+                    // You'll need to add NavRoutes.SETTINGS
+                    _navigationEvent.emit(NavRoutes.SETTINGS)
+                }
+            }
         }
     }
 
@@ -111,7 +128,7 @@ class HomeViewModel @Inject constructor(
                 // Assuming getCurrentUser might fetch from Firestore and needs to be async
                 // For simplicity, using the potentially cached version. Adapt if fetch is needed.
                 val currentUser = authRepository.getCurrentUser() // Ensure this provides needed data or make it async
-                val collectionUser = userRepository.getCollectionUser(currentUser?.id ?: "").collect { res ->
+                userRepository.getCollectionUser(currentUser?.id ?: "").collect { res ->
                     when (res) {
                         is Resource.Loading -> {
                             // Handle loading if needed
