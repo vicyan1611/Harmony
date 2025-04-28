@@ -3,6 +3,7 @@ package com.example.harmony.data.repository
 import com.example.harmony.core.common.Constants
 import com.example.harmony.core.common.Resource
 import com.example.harmony.domain.model.Channel
+import com.example.harmony.domain.model.ChannelType
 import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.ChannelRepository
 import com.example.harmony.domain.repository.ServerRepository
@@ -26,12 +27,14 @@ class ChannelRepositoryImpl @Inject constructor (
         const val CHANNEL_SERVER_ID_FIELD = "server"
         const val SERVER_CHANNELS_LIST_FIELD =  "channels"
         const val CHANNEL_MESSAGES_LIST_FIELD =  "messages"
+        const val CHANNEL_TYPE_FIELD = "type"
     }
 
     override fun createChannel(
         name: String,
         description: String,
-        serverId: String
+        serverId: String,
+        type: ChannelType
     ): Flow<Resource<Channel>> = flow {
         emit(Resource.Loading())
 
@@ -45,7 +48,8 @@ class ChannelRepositoryImpl @Inject constructor (
             CHANNEL_NAME_FIELD to name,
             CHANNEL_DESCRIPTION_FIELD to description,
             CHANNEL_SERVER_ID_FIELD to serverId,
-            CHANNEL_MESSAGES_LIST_FIELD to emptyList<DocumentType>()
+            CHANNEL_MESSAGES_LIST_FIELD to emptyList<DocumentType>(),
+            CHANNEL_TYPE_FIELD to type.name
             // Add other channel fields like type (TEXT/VOICE), etc.
         )
 
@@ -66,7 +70,8 @@ class ChannelRepositoryImpl @Inject constructor (
         val createdChannel = Channel(
             id = channelId,
             name = name,
-            description = description
+            description = description,
+            type = type
         )
         emit(Resource.Success(createdChannel))
 
@@ -87,9 +92,19 @@ class ChannelRepositoryImpl @Inject constructor (
         // Map the resulting documents to a list of Channel objects
         // Ensure Channel data class fields match Firestore fields
         val channelList = querySnapshot.documents.mapNotNull { document ->
-            // Map Firestore document to Channel object.
-            // Assuming Channel model has an 'id' field. Use @DocumentId or set manually.
-            document.toObject(Channel::class.java)?.copy(id = document.id) // Example setting ID from document ID
+            try {
+                document.toObject(Channel::class.java)?.copy(
+                    id = document.id,
+                    type = try {
+                        enumValueOf<ChannelType>(document.getString(CHANNEL_TYPE_FIELD) ?: ChannelType.TEXT.name)
+                    } catch (e: IllegalArgumentException) {
+                        ChannelType.TEXT // Default if field missing or invalid
+                    }
+                )
+            } catch (e: Exception) {
+                println("Error parsing channel document ${document.id}: ${e.message}")
+                null // Skip malformed documents
+            }
         }
         // Emit success with the list of channels (metadata only)
         emit(Resource.Success(channelList))

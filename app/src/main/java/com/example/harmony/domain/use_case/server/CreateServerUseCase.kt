@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.core.app.PendingIntentCompat.send
 import com.example.harmony.core.common.Constants
 import com.example.harmony.core.common.Resource
+import com.example.harmony.domain.model.ChannelType
 import com.example.harmony.domain.model.Server
 import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.ChannelRepository
@@ -54,7 +55,7 @@ class CreateServerUseCase @Inject constructor(
                         userRepository.appendListJoinedServerIds(ownerId, server.id).collect {
                             send(Resource.Success(server.id))
                         }
-                        channelRepository.createChannel("general", "", server.id).collect {
+                        channelRepository.createChannel("general", "", server.id, ChannelType.TEXT).collect {
                             send(Resource.Success(server.id))
                         }
                         send(Resource.Success(inviteLink)) // Emit the constructed link

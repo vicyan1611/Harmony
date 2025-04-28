@@ -6,12 +6,14 @@ import com.example.harmony.data.repository.ChannelRepositoryImpl
 import com.example.harmony.data.repository.ServerRepositoryImpl
 import com.example.harmony.data.repository.UserRepositoryImpl
 import com.example.harmony.data.repository.MessageRepositoryImpl
+import com.example.harmony.data.repository.PresenceRepositoryImpl
 import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.DirectMessageRepository
 import com.example.harmony.domain.repository.ChannelRepository
 import com.example.harmony.domain.repository.ServerRepository
 import com.example.harmony.domain.repository.UserRepository
 import com.example.harmony.domain.repository.MessageRepository
+import com.example.harmony.domain.repository.PresenceRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -57,4 +59,11 @@ abstract class RepositoryModule {
     abstract fun bindDirectMessageRepositoryImpl(
         directMessageRepositoryImpl: DirectMessageRepositoryImpl
     ): DirectMessageRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPresenceRepository(
+        presenceRepositoryImpl: PresenceRepositoryImpl
+    ): PresenceRepository
+
 }

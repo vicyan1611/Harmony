@@ -173,13 +173,22 @@ fun HomeScreen(
                     serverName = state.selectedServer?.server?.name,
                     channels = state.selectedServer?.channels ?: emptyList(),
                     currentUser = state.user,
-                    onChannelClick = { channel ->
+                    onTextChannelClick = { channel ->
                         val currentServerId = state.selectedServer?.server?.id
                         if (currentServerId != null) {
-                            val route = NavRoutes.getChatRoute(currentServerId, channel.id)
+                            val route = NavRoutes.getChatRoute(currentServerId, channel.id) // Existing chat route
                             navController.navigate(route)
                         } else {
-                            println("Error: No server selected to navigate to channel.")
+                            // Handle error: No server selected
+                        }
+                    },
+                    onVoiceChannelClick = { channel ->
+                        val currentServerId = state.selectedServer?.server?.id
+                        if (currentServerId != null) {
+                            val route = NavRoutes.getVoiceChannelRoute(currentServerId, channel.id) // New voice route
+                            navController.navigate(route)
+                        } else {
+                            // Handle error: No server selected
                         }
                     },
                     onAddChannelClick = { viewModel.onEvent(HomeEvent.OnShowAddChannelSheet) },
@@ -209,17 +218,19 @@ fun HomeScreen(
             onDismissRequest = { viewModel.onEvent(HomeEvent.OnDismissAddChannelSheet) }, // Handle dismiss
             sheetState = addChannelSheetState,
             containerColor = MaterialTheme.colorScheme.surface, // Use M3 color scheme
-            // You can adjust drag handle, window insets etc. here if needed
-            // dragHandle = { BottomSheetDefaults.DragHandle() }
         ) {
             // Content of the bottom sheet
             AddChannelSheetContent(
                 channelName = state.newChannelName,
                 channelDescription = state.newChannelDescription,
+                selectedChannelType = state.newChannelType,
                 isLoading = state.isCreatingChannel,
                 error = state.createChannelError,
                 onNameChange = { viewModel.onEvent(HomeEvent.OnNewChannelNameChange(it)) },
                 onDescriptionChange = { viewModel.onEvent(HomeEvent.OnNewChannelDescriptionChange(it)) },
+                onTypeSelected = { selectedType ->
+                    viewModel.onEvent(HomeEvent.OnNewChannelTypeChange(selectedType))
+                },
                 onCreateClick = { viewModel.onEvent(HomeEvent.OnCreateChannelClicked) },
                 onDismissRequest = { viewModel.onEvent(HomeEvent.OnDismissAddChannelSheet) } // Pass dismiss handler
             )

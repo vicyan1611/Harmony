@@ -23,6 +23,7 @@
     <string name="server_creation_createbutton">Create Server</string>
     <string name="add_channel_sheet_create_button">Create Channel</string>
     <string name="channel_list_display_title_textchannel">Text Channels</string>
+    <string name="channel_list_display_title_voicechannel">Voice Channels</string>
     <string name="add_channel_sheet_title">Create Channel</string>
     <string name="add_channel_sheet_name_label">Channel Name</string>
     <string name="add_channel_sheet_description_label">Channel Description (Optional)</string>

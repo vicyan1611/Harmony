@@ -1,6 +1,7 @@
 // harmony/presentation/main/home/HomeState.kt
 package com.example.harmony.presentation.main.home
 
+import com.example.harmony.domain.model.ChannelType
 import com.example.harmony.domain.model.ServerWithChannels
 import com.example.harmony.domain.model.User
 
@@ -20,6 +21,7 @@ data class HomeState(
     val isAddChannelSheetVisible: Boolean = false,
     val newChannelName: String = "",
     val newChannelDescription: String = "",
+    val newChannelType: ChannelType = ChannelType.TEXT,
     val isCreatingChannel: Boolean = false,
     val createChannelError: String? = null,
 

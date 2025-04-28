@@ -19,6 +19,7 @@ import com.example.harmony.presentation.main.dm.DirectMessageListScreen
 import com.example.harmony.presentation.main.home.HomeScreen
 import com.example.harmony.presentation.main.join_server.JoinServerScreen
 import com.example.harmony.presentation.main.search.UserSearchScreen
+import com.example.harmony.presentation.main.voice.VoiceChannelScreen
 
 @Composable
 fun NavGraph(
@@ -144,6 +145,17 @@ fun NavGraph(
             arguments = listOf(navArgument("conversationId") { type = NavType.StringType })
         ) {
             DirectMessageChatScreen() // ViewModel gets args via SavedStateHandle
+        }
+
+        composable(
+            route = NavRoutes.VOICE_CHANNEL,
+            arguments = listOf(
+                navArgument("serverId") { type = NavType.StringType },
+                navArgument("channelId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            VoiceChannelScreen(navController = navController)
         }
 
         composable(route = NavRoutes.USER_SEARCH) {

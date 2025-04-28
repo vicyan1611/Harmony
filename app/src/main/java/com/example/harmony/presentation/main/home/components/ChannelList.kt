@@ -10,25 +10,24 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Tag // For text channels
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.harmony.R
 import com.example.harmony.core.components.RoundedAvatar
-import com.example.harmony.core.components.RoundedButton
 import com.example.harmony.domain.model.Channel
+import com.example.harmony.domain.model.ChannelType
 import com.example.harmony.domain.model.User
 import com.example.harmony.presentation.main.home.HomeEvent
 import com.example.harmony.presentation.main.home.HomeViewModel
@@ -38,9 +37,10 @@ fun ChannelList(
     serverName: String?,
     channels: List<Channel>,
     currentUser: User?, // Needed for user panel at the bottom
-    onChannelClick: (Channel) -> Unit,
-    onAddChannelClick: () -> Unit, // TODO: Implement later
-    onUserSettingsClick: () -> Unit, // TODO: Implement later
+    onVoiceChannelClick: (Channel) -> Unit,
+    onTextChannelClick: (Channel) -> Unit,
+    onAddChannelClick: () -> Unit,
+    onUserSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
     isHost: Boolean = true,
     onAvatarClick: () -> Unit,
@@ -98,23 +98,45 @@ fun ChannelList(
                 .padding(horizontal = 8.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            item {
-                ChannelCategoryHeader(
-                    name = stringResource(R.string.channel_list_display_title_textchannel),
-                    // Pass the lambda here
-                    onAddClick = onAddChannelClick,
-                    canAddChannel = isHost
-                )
-            }
+            val textChannels = channels.filter { it.type == ChannelType.TEXT }
+            val voiceChannels = channels.filter { it.type == ChannelType.VOICE }
 
-            items(channels, key = { it.id }) { channel ->
-                ChannelItem(
-                    channel = channel,
-                    isSelected = false,
-                    onClick = { onChannelClick(channel) }
-                )
+            if (textChannels.isNotEmpty()) {
+                item {
+                    ChannelCategoryHeader(
+                        name = stringResource(R.string.channel_list_display_title_textchannel),
+                        onAddClick = { /* TODO: Differentiate add text/voice? */ onAddChannelClick() },
+                        canAddChannel = isHost
+                    )
+                }
+                items(textChannels, key = { "text-${it.id}" }) { channel ->
+                    ChannelItem(
+                        channel = channel,
+                        isSelected = false, // TODO: Implement selection state if needed
+                        onClick = { onTextChannelClick(channel) } // Use text handler
+                    )
+                }
+            }
+            if (voiceChannels.isNotEmpty()) {
+                item {
+                    Spacer(modifier = Modifier.height(8.dp)) // Space between categories
+                    ChannelCategoryHeader(
+                        name = stringResource(R.string.channel_list_display_title_voicechannel), // Add this string resource
+                        onAddClick = { /* TODO: Differentiate add text/voice? */ onAddChannelClick() }, // Allow adding voice channels?
+                        canAddChannel = isHost
+                    )
+                }
+                items(voiceChannels, key = { "voice-${it.id}" }) { channel ->
+                    ChannelItem(
+                        channel = channel,
+                        isSelected = false, // TODO: Implement selection state if needed
+                        onClick = { onVoiceChannelClick(channel) } // Use voice handler
+                    )
+                }
             }
         }
+
+
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         // User Panel at the Bottom
@@ -177,10 +199,14 @@ private fun ChannelItem(
             .padding(horizontal = 8.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Use Tag icon for text channels (replace if you have voice channels later)
+        // Choose icon based on channel type
+        val icon = when (channel.type) {
+            ChannelType.TEXT -> Icons.Default.Tag
+            ChannelType.VOICE -> Icons.AutoMirrored.Filled.VolumeUp
+        }
         Icon(
-            imageVector = Icons.Default.Tag,
-            contentDescription = "Text Channel",
+            imageVector = icon,
+            contentDescription = if (channel.type == ChannelType.TEXT) "Text Channel" else "Voice Channel",
             tint = contentColor,
             modifier = Modifier.size(20.dp)
         )
@@ -193,7 +219,6 @@ private fun ChannelItem(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-        // Optional: Add icons for unread messages, mentions, etc. here
     }
 }
 

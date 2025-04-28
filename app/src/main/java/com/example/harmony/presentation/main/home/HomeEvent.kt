@@ -1,5 +1,6 @@
 package com.example.harmony.presentation.main.home
 
+import com.example.harmony.domain.model.ChannelType
 import com.example.harmony.domain.model.ServerWithChannels
 
 sealed class HomeEvent {
@@ -12,6 +13,7 @@ sealed class HomeEvent {
     object OnDismissAddChannelSheet : HomeEvent() // Event to hide the sheet
     data class OnNewChannelNameChange(val name: String) : HomeEvent()
     data class OnNewChannelDescriptionChange(val description: String) : HomeEvent()
+    data class OnNewChannelTypeChange(val type: ChannelType) : HomeEvent()
     object OnCreateChannelClicked : HomeEvent()
 
     object OnShowMyProfileSheet : HomeEvent()
