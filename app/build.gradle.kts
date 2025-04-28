@@ -101,6 +101,11 @@ dependencies {
 
     implementation(libs.androidx.material)
     implementation(libs.androidx.runtime.livedata)
+
+    implementation(libs.voice.sdk)
+
+
+
 }
 
 //kapt {

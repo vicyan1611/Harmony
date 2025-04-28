@@ -55,6 +55,7 @@
     <string name="error_user_not_logged_in">Người dùng chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.</string>
     <string name="add_channel_sheet_create_button">Tạo kênh</string>
     <string name="channel_list_display_title_textchannel">Kênh văn bản</string>
+    <string name="channel_list_display_title_voicechannel">Kênh âm thanh</string>
     <string name="add_channel_sheet_title">Tạo kênh</string>
     <string name="add_channel_sheet_name_label">Tên kênh</string>
     <string name="add_channel_sheet_description_label">Mô tả kênh</string>

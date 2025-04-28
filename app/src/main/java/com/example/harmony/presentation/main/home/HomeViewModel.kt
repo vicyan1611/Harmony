@@ -102,6 +102,11 @@ class HomeViewModel @Inject constructor(
                     _state.update { it.copy(newChannelDescription = event.description) }
                 }
             }
+
+            is HomeEvent.OnNewChannelTypeChange -> {
+                _state.update { it.copy(newChannelType = event.type) }
+            }
+
             HomeEvent.OnCreateChannelClicked -> {
                 createChannel()
             }
@@ -216,6 +221,7 @@ class HomeViewModel @Inject constructor(
     private fun createChannel() {
         val name = state.value.newChannelName.trim()
         val description = state.value.newChannelDescription.trim()
+        val type = state.value.newChannelType
         val serverId = state.value.selectedServer?.server?.id
 
         if (name.isBlank()) {
@@ -227,7 +233,7 @@ class HomeViewModel @Inject constructor(
             return
         }
 
-        channelRepository.createChannel(name = name, description = description, serverId = serverId)
+        channelRepository.createChannel(name = name, description = description, serverId = serverId, type = type)
             .onEach { result ->
                 when (result) {
                     is Resource.Loading -> {
