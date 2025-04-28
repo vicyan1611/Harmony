@@ -1,6 +1,7 @@
 package com.example.harmony.data.repository
 
 import android.net.Uri
+import android.util.Log
 import com.example.harmony.core.common.Constants.CHANNELS_COLLECTION
 import com.example.harmony.core.common.Constants.ERROR_SOMETHING_WENT_WRONG
 import com.example.harmony.core.common.Constants.MESSAGES_COLLECTION
@@ -9,6 +10,7 @@ import com.example.harmony.core.common.Resource
 import com.example.harmony.domain.model.Message
 import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.MessageRepository
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
@@ -69,7 +71,8 @@ class MessageRepositoryImpl @Inject constructor(
                 "senderDisplayName" to message.senderDisplayName,
                 "senderPhotoUrl" to message.senderPhotoUrl,
                 "text" to message.text,
-                "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp()
+                "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
+                "reactions" to emptyMap<String, Int>()
             )
 
             if (finalImageUrl != null) {
@@ -93,7 +96,7 @@ class MessageRepositoryImpl @Inject constructor(
             .collection(MESSAGES_COLLECTION)
             .orderBy("timestamp", Query.Direction.ASCENDING)
 
-
+        val currentUserId = authRepository.getCurrentUser()?.id ?: return@callbackFlow
         val listenerRegistration = query.addSnapshotListener { snapshots, error ->
             if (error != null) {
 
@@ -104,8 +107,14 @@ class MessageRepositoryImpl @Inject constructor(
 
             if (snapshots != null) {
                 val messages = snapshots.documents.mapNotNull { doc ->
+                    Log.d("TTT", doc.toString())
                     try {
-                        doc.toObject(Message::class.java)?.copy(id = doc.id)
+                        val tmp = doc.toObject(Message::class.java)?.copy(id = doc.id)
+                        val reactions = tmp?.reactions
+                        if (reactions!= null) {
+                            tmp.currentUserReactionIndex = reactions[currentUserId]
+                        }
+                        tmp
                     } catch (e: Exception) {
                         println("Error parsing DM document ${doc.id}: ${e.message}")
                         null
@@ -118,5 +127,39 @@ class MessageRepositoryImpl @Inject constructor(
 
         }
         awaitClose { listenerRegistration.remove() }
+    }
+
+    override fun updateMessageReaction(
+        serverId: String,
+        channelId: String,
+        messageId: String,
+        emojiIndex: Int?
+    ): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
+        val currentUserId = authRepository.getCurrentUser()?.id
+        if (currentUserId == null) {
+            emit(Resource.Error("User not authenticated"))
+            return@flow
+        }
+
+        try {
+            val messageRef = firestore.collection(SERVERS_COLLECTION).document(serverId)
+                .collection(CHANNELS_COLLECTION).document(channelId)
+                .collection(MESSAGES_COLLECTION).document(messageId)
+
+            // Use dot notation for map field updates
+            val reactionField = "reactions.$currentUserId"
+
+            if (emojiIndex != null) {
+                // Add or update the reaction
+                messageRef.update(reactionField, emojiIndex).await()
+            } else {
+                // Remove the reaction using FieldValue.delete()
+                messageRef.update(reactionField, FieldValue.delete()).await()
+            }
+            emit(Resource.Success(Unit))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: ERROR_SOMETHING_WENT_WRONG))
+        }
     }
 }

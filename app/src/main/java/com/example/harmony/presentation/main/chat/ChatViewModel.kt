@@ -10,6 +10,7 @@ import com.example.harmony.domain.repository.AuthRepository
 import com.example.harmony.domain.repository.MessageRepository
 import com.example.harmony.domain.use_case.chat.SendChatMessageUseCase
 import com.example.harmony.domain.repository.UserRepository
+import com.example.harmony.domain.use_case.chat.ReactToMessageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +26,7 @@ class ChatViewModel @Inject constructor(
     private val messageRepository: MessageRepository,
     private val authRepository: AuthRepository,
     private val savedStateHandle: SavedStateHandle,
+    private val reactToMessageUseCase: ReactToMessageUseCase,
     private val userRepository: UserRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatState())
@@ -120,6 +122,12 @@ class ChatViewModel @Inject constructor(
             is ChatEvent.OnClearSelectedImage -> {
                 _state.update { it.copy(selectedImageUri = null) }
             }
+            is ChatEvent.OnReactToMessage -> {
+                reactToMessage(event.messageId, event.emojiIndex)
+            }
+            is ChatEvent.OnRemoveReaction -> {
+                removeReaction(event.messageId)
+            }
         }
     }
 
@@ -168,6 +176,77 @@ class ChatViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
 
+    private fun reactToMessage(messageId: String, emojiIndex: Int) {
+        val currentUserId = state.value.currentUser?.id ?: return
+        val message = state.value.messages.find { it.id == messageId } ?: return
+
+        // Check if user is clicking the same emoji they already reacted with
+        if (message.currentUserReactionIndex == emojiIndex) {
+            removeReaction(messageId) // Call remove logic
+        } else {
+            // Optimistic UI Update (optional but improves UX)
+            updateLocalMessageReaction(messageId, emojiIndex)
+
+            // Call Use Case
+            reactToMessageUseCase(
+                serverId = serverId,
+                channelId = channelId,
+                messageId = messageId,
+                emojiIndex = emojiIndex
+            ).onEach { result ->
+                if (result is Resource.Error) {
+                    // Revert optimistic update on error (optional)
+                    updateLocalMessageReaction(messageId, message.currentUserReactionIndex) // Revert to original
+                    Log.e("ChatViewModel", "Failed to react: ${result.message}")
+                    // Show error to user?
+                    _state.update { it.copy(error = "Reaction failed: ${result.message}") }
+                    viewModelScope.launch { kotlinx.coroutines.delay(3000); _state.update { it.copy(error = null) } }
+                }
+                // Success case is handled by Firestore listener updating the state naturally,
+                // or by the optimistic update if you keep it.
+            }.launchIn(viewModelScope)
+        }
+    }
+
+    private fun removeReaction(messageId: String) {
+        val currentUserId = state.value.currentUser?.id ?: return
+        val message = state.value.messages.find { it.id == messageId } ?: return
+
+        // Optimistic UI Update
+        updateLocalMessageReaction(messageId, null) // Set to null locally
+
+        // Call Use Case with null index
+        reactToMessageUseCase(
+            serverId = serverId,
+            channelId = channelId,
+            messageId = messageId,
+            emojiIndex = null // Indicate removal
+        ).onEach { result ->
+            if (result is Resource.Error) {
+                // Revert optimistic update on error (optional)
+                updateLocalMessageReaction(messageId, message.currentUserReactionIndex) // Revert to original
+                Log.e("ChatViewModel", "Failed to remove reaction: ${result.message}")
+                // Show error to user?
+                _state.update { it.copy(error = "Remove reaction failed: ${result.message}") }
+                viewModelScope.launch { kotlinx.coroutines.delay(3000); _state.update { it.copy(error = null) } }
+            }
+            // Success is handled by listener or optimistic update
+        }.launchIn(viewModelScope)
+    }
+
+    // Helper for optimistic UI update
+    private fun updateLocalMessageReaction(messageId: String, newEmojiIndex: Int?) {
+        _state.update { currentState ->
+            val updatedMessages = currentState.messages.map { msg ->
+                if (msg.id == messageId) {
+                    msg.apply { currentUserReactionIndex = newEmojiIndex } // Update transient field
+                } else {
+                    msg
+                }
+            }
+            currentState.copy(messages = updatedMessages)
+        }
     }
 }

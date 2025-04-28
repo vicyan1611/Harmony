@@ -12,5 +12,10 @@ interface MessageRepository {
 //    A Flow emitting Resource<List<Message>> containing the list of messages or an error.
     fun getMessages(serverId: String, channelId: String): Flow<Resource<List<Message>>>
 
-
+    fun updateMessageReaction(
+        serverId: String,
+        channelId: String,
+        messageId: String,
+        emojiIndex: Int? // Null to remove reaction
+    ): Flow<Resource<Unit>>
 }
